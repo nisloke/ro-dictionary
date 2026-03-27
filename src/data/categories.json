@@ -1,0 +1,68 @@
+[
+  {
+    "code": "job",
+    "name": "직업 약칭",
+    "order": 1,
+    "description": "직업 이름의 축약어 및 별칭"
+  },
+  {
+    "code": "job-build",
+    "name": "직업 빌드/역할",
+    "order": 2,
+    "description": "직업 빌드 유형 및 파티 내 역할"
+  },
+  {
+    "code": "gear",
+    "name": "장비·아이템",
+    "order": 3,
+    "description": "장비 시리즈, 부위, 시스템 관련 용어"
+  },
+  {
+    "code": "gear-prefix",
+    "name": "장비 접두어·접미어",
+    "order": 4,
+    "description": "장비 수치·등급·상태 표기"
+  },
+  {
+    "code": "gear-consumable",
+    "name": "소비 아이템",
+    "order": 5,
+    "description": "소모성 아이템 및 재료"
+  },
+  {
+    "code": "system",
+    "name": "시스템·메카닉",
+    "order": 6,
+    "description": "게임 시스템, 제련, 성장, 전투 메카닉"
+  },
+  {
+    "code": "stat",
+    "name": "스탯·수치",
+    "order": 7,
+    "description": "캐릭터 능력치 관련 용어"
+  },
+  {
+    "code": "place",
+    "name": "사냥터·콘텐츠",
+    "order": 8,
+    "description": "사냥터, 던전, 마을, 콘텐츠 약칭"
+  },
+  {
+    "code": "slang",
+    "name": "커뮤니티 은어",
+    "order": 9,
+    "description": "게임 커뮤니티에서 사용하는 은어·속어"
+  },
+  {
+    "code": "notation",
+    "name": "숫자·기호 표기법",
+    "order": 10,
+    "description": "제련 수치, 등급, 가격 등 표기 규칙"
+  },
+  {
+    "code": "history",
+    "name": "게임 역사·문화",
+    "order": 11,
+    "description": "라그나로크 온라인 역사적 사건 및 문화"
+  }
+]

@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Search from '../components/Search.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import TermTable from '../components/TermTable.astro';
+
+import categories from '../data/categories.json';
+import terms from '../data/terms.json';
+
+const totalCount = terms.length;
+const sorted = [...categories].sort((a, b) => a.order - b.order);
+---
+
+<Layout title="RO 용어 사전">
+  <Header totalCount={totalCount} />
+
+  <Search />
+
+  <div class="flex flex-col lg:flex-row gap-8">
+    <aside class="lg:w-64 shrink-0">
+      <TableOfContents />
+    </aside>
+    <main class="flex-1 min-w-0">
+      {sorted.map((cat) => <TermTable category={cat.code} />)}
+    </main>
+  </div>
+
+  <Footer lastUpdated="2026-03-27" />
+</Layout>

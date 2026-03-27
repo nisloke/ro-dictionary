@@ -1,0 +1,3785 @@
+[
+  {
+    "id": "노비",
+    "term": "노비",
+    "fullName": "노비스 (Novice)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "초보자 직업",
+    "tags": [
+      "노비",
+      "노비스 (Novice)",
+      "Novice",
+      "job"
+    ]
+  },
+  {
+    "id": "슈노",
+    "term": "슈노",
+    "fullName": "슈퍼 노비스 (Super Novice)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "확장 직업. 모든 1·2차 스킬 일부 사용 가능",
+    "tags": [
+      "슈노",
+      "슈퍼 노비스 (Super Novice)",
+      "Super Novice",
+      "job"
+    ]
+  },
+  {
+    "id": "복사",
+    "term": "복사",
+    "fullName": "어콜라이트 (Acolyte)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "힐러 계열 1차",
+    "tags": [
+      "복사",
+      "어콜라이트 (Acolyte)",
+      "Acolyte",
+      "힐러",
+      "job"
+    ]
+  },
+  {
+    "id": "상인",
+    "term": "상인",
+    "fullName": "머천트 (Merchant)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "상인 계열 1차",
+    "tags": [
+      "상인",
+      "머천트 (Merchant)",
+      "Merchant",
+      "job"
+    ]
+  },
+  {
+    "id": "마법사",
+    "term": "마법사",
+    "fullName": "매지션 (Magician)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "",
+    "tags": [
+      "마법사",
+      "매지션 (Magician)",
+      "Magician",
+      "job"
+    ]
+  },
+  {
+    "id": "도둑",
+    "term": "도둑",
+    "fullName": "시프 (Thief)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "",
+    "tags": [
+      "도둑",
+      "시프 (Thief)",
+      "Thief",
+      "job"
+    ]
+  },
+  {
+    "id": "궁수",
+    "term": "궁수",
+    "fullName": "아처 (Archer)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "",
+    "tags": [
+      "궁수",
+      "아처 (Archer)",
+      "Archer",
+      "job"
+    ]
+  },
+  {
+    "id": "검사",
+    "term": "검사",
+    "fullName": "소드맨 (Swordman)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "",
+    "tags": [
+      "검사",
+      "소드맨 (Swordman)",
+      "Swordman",
+      "job"
+    ]
+  },
+  {
+    "id": "건슬",
+    "term": "건슬",
+    "fullName": "건슬링어 (Gunslinger)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "확장 1차 직업",
+    "tags": [
+      "건슬",
+      "건슬링어 (Gunslinger)",
+      "Gunslinger",
+      "job"
+    ]
+  },
+  {
+    "id": "닌자",
+    "term": "닌자",
+    "fullName": "닌자 (Ninja)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "확장 1차 직업",
+    "tags": [
+      "닌자",
+      "닌자 (Ninja)",
+      "Ninja",
+      "job"
+    ]
+  },
+  {
+    "id": "권성",
+    "term": "권성",
+    "fullName": "권성 (태권소년/소녀)",
+    "category": "job",
+    "subcategory": "1차 직업",
+    "description": "확장 1차 직업",
+    "tags": [
+      "권성",
+      "권성 (태권소년/소녀)",
+      "태권소년",
+      "태권소녀",
+      "job"
+    ]
+  },
+  {
+    "id": "나이트-기사",
+    "term": "나이트/기사",
+    "fullName": "나이트 (Knight)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "검사 계열 2-1차",
+    "tags": [
+      "나이트/기사",
+      "나이트 (Knight)",
+      "Knight",
+      "기사",
+      "job"
+    ]
+  },
+  {
+    "id": "크루-크루세",
+    "term": "크루/크루세",
+    "fullName": "크루세이더 (Crusader)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "검사 계열 2-2차. 방어 특화",
+    "tags": [
+      "크루/크루세",
+      "크루세이더 (Crusader)",
+      "Crusader",
+      "job"
+    ]
+  },
+  {
+    "id": "프리",
+    "term": "프리",
+    "fullName": "프리스트 (Priest)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "복사 계열 2-1차. 힐러/버퍼",
+    "tags": [
+      "프리",
+      "프리스트 (Priest)",
+      "Priest",
+      "힐러",
+      "버퍼",
+      "job"
+    ]
+  },
+  {
+    "id": "몽크",
+    "term": "몽크",
+    "fullName": "몽크 (Monk)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "복사 계열 2-2차. 격투가",
+    "tags": [
+      "몽크",
+      "몽크 (Monk)",
+      "Monk",
+      "격투가",
+      "job"
+    ]
+  },
+  {
+    "id": "위즈",
+    "term": "위즈",
+    "fullName": "위자드 (Wizard)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "마법사 계열 2-1차",
+    "tags": [
+      "위즈",
+      "위자드 (Wizard)",
+      "Wizard",
+      "job"
+    ]
+  },
+  {
+    "id": "세이지",
+    "term": "세이지",
+    "fullName": "세이지 (Sage)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "마법사 계열 2-2차",
+    "tags": [
+      "세이지",
+      "세이지 (Sage)",
+      "Sage",
+      "job"
+    ]
+  },
+  {
+    "id": "헌터",
+    "term": "헌터",
+    "fullName": "헌터 (Hunter)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "궁수 계열 2-1차",
+    "tags": [
+      "헌터",
+      "헌터 (Hunter)",
+      "Hunter",
+      "job"
+    ]
+  },
+  {
+    "id": "바드-댄서",
+    "term": "바드/댄서",
+    "fullName": "바드/댄서 (Bard/Dancer)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "궁수 계열 2-2차. 성별 분리",
+    "tags": [
+      "바드/댄서",
+      "바드/댄서 (Bard/Dancer)",
+      "Bard/Dancer",
+      "Bard",
+      "Dancer",
+      "job"
+    ]
+  },
+  {
+    "id": "어쎄-씬",
+    "term": "어쎄/씬",
+    "fullName": "어쌔신 (Assassin)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "도둑 계열 2-1차",
+    "tags": [
+      "어쎄/씬",
+      "어쌔신 (Assassin)",
+      "Assassin",
+      "job"
+    ]
+  },
+  {
+    "id": "로그",
+    "term": "로그",
+    "fullName": "로그 (Rogue)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "도둑 계열 2-2차. 스틸/도작 특화",
+    "tags": [
+      "로그",
+      "로그 (Rogue)",
+      "Rogue",
+      "job"
+    ]
+  },
+  {
+    "id": "블스",
+    "term": "블스",
+    "fullName": "블랙스미스 (Blacksmith)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "상인 계열 2-1차",
+    "tags": [
+      "블스",
+      "블랙스미스 (Blacksmith)",
+      "Blacksmith",
+      "job"
+    ]
+  },
+  {
+    "id": "알케",
+    "term": "알케",
+    "fullName": "알케미스트 (Alchemist)",
+    "category": "job",
+    "subcategory": "2차 직업",
+    "description": "상인 계열 2-2차",
+    "tags": [
+      "알케",
+      "알케미스트 (Alchemist)",
+      "Alchemist",
+      "job"
+    ]
+  },
+  {
+    "id": "룬나",
+    "term": "룬나",
+    "fullName": "룬 나이트 (Rune Knight)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "기사→. 이그니션 브레이크 등. 룬 소비",
+    "tags": [
+      "룬나",
+      "룬 나이트 (Rune Knight)",
+      "Rune Knight",
+      "job"
+    ]
+  },
+  {
+    "id": "로가",
+    "term": "로가",
+    "fullName": "로얄 가드 (Royal Guard)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "크루세이더→. 탱커 역할",
+    "tags": [
+      "로가",
+      "로얄 가드 (Royal Guard)",
+      "Royal Guard",
+      "탱커",
+      "job"
+    ]
+  },
+  {
+    "id": "아비",
+    "term": "아비",
+    "fullName": "아크 비숍 (Arch Bishop)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "프리스트→. 최상위 힐러/버퍼",
+    "tags": [
+      "아비",
+      "아크 비숍 (Arch Bishop)",
+      "Arch Bishop",
+      "힐러",
+      "버퍼",
+      "job"
+    ]
+  },
+  {
+    "id": "수라",
+    "term": "수라",
+    "fullName": "수라 (Sura)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "몽크→. 금강불괴 탱킹",
+    "tags": [
+      "수라",
+      "수라 (Sura)",
+      "Sura",
+      "job"
+    ]
+  },
+  {
+    "id": "워록",
+    "term": "워록",
+    "fullName": "워록 (Warlock)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "위자드→. 상위 마법 딜러",
+    "tags": [
+      "워록",
+      "워록 (Warlock)",
+      "Warlock",
+      "job"
+    ]
+  },
+  {
+    "id": "소서",
+    "term": "소서",
+    "fullName": "소서러 (Sorcerer)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "세이지→. 정령 소환",
+    "tags": [
+      "소서",
+      "소서러 (Sorcerer)",
+      "Sorcerer",
+      "job"
+    ]
+  },
+  {
+    "id": "레인저",
+    "term": "레인저",
+    "fullName": "레인저 (Ranger)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "헌터→. 원거리 물리",
+    "tags": [
+      "레인저",
+      "레인저 (Ranger)",
+      "Ranger",
+      "job"
+    ]
+  },
+  {
+    "id": "민스트럴-원더러",
+    "term": "민스트럴/원더러",
+    "fullName": "민스트럴/원더러 (Minstrel/Wanderer)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "바드/댄서→",
+    "tags": [
+      "민스트럴/원더러",
+      "민스트럴/원더러 (Minstrel/Wanderer)",
+      "Minstrel/Wanderer",
+      "Minstrel",
+      "Wanderer",
+      "job"
+    ]
+  },
+  {
+    "id": "길크",
+    "term": "길크",
+    "fullName": "길로틴 크로스 (Guillotine Cross)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "어쌔신→. 근접 물리 딜러",
+    "tags": [
+      "길크",
+      "길로틴 크로스 (Guillotine Cross)",
+      "Guillotine Cross",
+      "job"
+    ]
+  },
+  {
+    "id": "쉐체",
+    "term": "쉐체",
+    "fullName": "쉐도우 체이서 (Shadow Chaser)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "로그→. 도작/마검",
+    "tags": [
+      "쉐체",
+      "쉐도우 체이서 (Shadow Chaser)",
+      "Shadow Chaser",
+      "job"
+    ]
+  },
+  {
+    "id": "제너릭",
+    "term": "제너릭",
+    "fullName": "제네틱 (Genetic)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "알케미스트→",
+    "tags": [
+      "제너릭",
+      "제네틱 (Genetic)",
+      "Genetic",
+      "job"
+    ]
+  },
+  {
+    "id": "메카닉",
+    "term": "메카닉",
+    "fullName": "메카닉 (Mechanic)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "블랙스미스→",
+    "tags": [
+      "메카닉",
+      "메카닉 (Mechanic)",
+      "Mechanic",
+      "job"
+    ]
+  },
+  {
+    "id": "성제",
+    "term": "성제",
+    "fullName": "성제 (Star Emperor)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "권성→. 확장 3차",
+    "tags": [
+      "성제",
+      "성제 (Star Emperor)",
+      "Star Emperor",
+      "job"
+    ]
+  },
+  {
+    "id": "소울리퍼",
+    "term": "소울리퍼",
+    "fullName": "소울 리퍼 (Soul Reaper)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "소울 링커→. 확장 3차",
+    "tags": [
+      "소울리퍼",
+      "소울 리퍼 (Soul Reaper)",
+      "Soul Reaper",
+      "job"
+    ]
+  },
+  {
+    "id": "리벨리온",
+    "term": "리벨리온",
+    "fullName": "리벨리온 (Rebellion)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "건슬링어→. 확장 2차",
+    "tags": [
+      "리벨리온",
+      "리벨리온 (Rebellion)",
+      "Rebellion",
+      "job"
+    ]
+  },
+  {
+    "id": "카게로-오보로",
+    "term": "카게로/오보로",
+    "fullName": "카게로/오보로 (Kagerou/Oboro)",
+    "category": "job",
+    "subcategory": "3차 직업",
+    "description": "닌자→. 확장 2차",
+    "tags": [
+      "카게로/오보로",
+      "카게로/오보로 (Kagerou/Oboro)",
+      "Kagerou/Oboro",
+      "Kagerou",
+      "Oboro",
+      "job"
+    ]
+  },
+  {
+    "id": "드나",
+    "term": "드나",
+    "fullName": "드래곤 나이트 (Dragon Knight)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "기사 계열 4차. 핵슬(핵 엔드 슬래셔) 주력",
+    "tags": [
+      "드나",
+      "드래곤 나이트 (Dragon Knight)",
+      "Dragon Knight",
+      "핵슬",
+      "job"
+    ]
+  },
+  {
+    "id": "임가",
+    "term": "임가",
+    "fullName": "임페리얼 가드 (Imperial Guard)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "크루세이더 계열 4차. 성기사/탱커",
+    "tags": [
+      "임가",
+      "임페리얼 가드 (Imperial Guard)",
+      "Imperial Guard",
+      "탱커",
+      "job"
+    ]
+  },
+  {
+    "id": "카디",
+    "term": "카디",
+    "fullName": "카디날 (Cardinal)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "프리스트 계열 4차. 최상위 힐러",
+    "tags": [
+      "카디",
+      "카디날 (Cardinal)",
+      "Cardinal",
+      "힐러",
+      "job"
+    ]
+  },
+  {
+    "id": "인퀴",
+    "term": "인퀴",
+    "fullName": "인퀴지터 (Inquisitor)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "몽크 계열 4차",
+    "tags": [
+      "인퀴",
+      "인퀴지터 (Inquisitor)",
+      "Inquisitor",
+      "job"
+    ]
+  },
+  {
+    "id": "앜메",
+    "term": "앜메",
+    "fullName": "아크메이지 (Arch Mage)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "마법사(위즈) 계열 4차. 6속성 장판 딜. 마공 가성비 왕",
+    "tags": [
+      "앜메",
+      "아크메이지 (Arch Mage)",
+      "Arch Mage",
+      "마공",
+      "job"
+    ]
+  },
+  {
+    "id": "엘마",
+    "term": "엘마",
+    "fullName": "엘레멘탈 마스터 (Elemental Master)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "세이지 계열 4차. 원소 특화",
+    "tags": [
+      "엘마",
+      "엘레멘탈 마스터 (Elemental Master)",
+      "Elemental Master",
+      "job"
+    ]
+  },
+  {
+    "id": "호크",
+    "term": "호크",
+    "fullName": "윈드 호크 (Wind Hawk)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "헌터 계열 4차. 궁수 상위",
+    "tags": [
+      "호크",
+      "윈드 호크 (Wind Hawk)",
+      "Wind Hawk",
+      "job"
+    ]
+  },
+  {
+    "id": "바욜",
+    "term": "바욜",
+    "fullName": "바이올리스타 (Trouvere/Troubadour)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "바드/댄서 계열 4차",
+    "tags": [
+      "바욜",
+      "바이올리스타 (Trouvere/Troubadour)",
+      "Trouvere/Troubadour",
+      "Trouvere",
+      "Troubadour",
+      "job"
+    ]
+  },
+  {
+    "id": "트루바드루",
+    "term": "트루바드루",
+    "fullName": "트루바두르 (Troubadour)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "바욜의 남캐 명칭",
+    "tags": [
+      "트루바드루",
+      "트루바두르 (Troubadour)",
+      "Troubadour",
+      "job"
+    ]
+  },
+  {
+    "id": "쉐크",
+    "term": "쉐크",
+    "fullName": "쉐도우 크로스 (Shadow Cross)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "어쌔신 계열 4차",
+    "tags": [
+      "쉐크",
+      "쉐도우 크로스 (Shadow Cross)",
+      "Shadow Cross",
+      "job"
+    ]
+  },
+  {
+    "id": "어체",
+    "term": "어체",
+    "fullName": "어비스 체이서 (Abyss Chaser)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "로그 계열 4차",
+    "tags": [
+      "어체",
+      "어비스 체이서 (Abyss Chaser)",
+      "Abyss Chaser",
+      "job"
+    ]
+  },
+  {
+    "id": "마이",
+    "term": "마이",
+    "fullName": "마이스터 (Meister)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "블랙스미스 계열 4차. 도끼마이 = 도끼 빌드",
+    "tags": [
+      "마이",
+      "마이스터 (Meister)",
+      "Meister",
+      "도끼마이",
+      "job"
+    ]
+  },
+  {
+    "id": "바이오로",
+    "term": "바이오로",
+    "fullName": "바이오로 (Biolo)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "알케미스트 계열 4차",
+    "tags": [
+      "바이오로",
+      "바이오로 (Biolo)",
+      "Biolo",
+      "job"
+    ]
+  },
+  {
+    "id": "냥냥",
+    "term": "냥냥",
+    "fullName": "도람족 (Summoner)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "고양이 외형 종족. 도람 통칭",
+    "tags": [
+      "냥냥",
+      "도람족 (Summoner)",
+      "Summoner",
+      "도람",
+      "job"
+    ]
+  },
+  {
+    "id": "하노",
+    "term": "하노",
+    "fullName": "하이퍼 노비스 (Hyper Novice)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "슈퍼 노비스 계열 4차 확장",
+    "tags": [
+      "하노",
+      "하이퍼 노비스 (Hyper Novice)",
+      "Hyper Novice",
+      "job"
+    ]
+  },
+  {
+    "id": "천제",
+    "term": "천제",
+    "fullName": "천제 (Sky Emperor)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "성제 상위. 확장 4차",
+    "tags": [
+      "천제",
+      "천제 (Sky Emperor)",
+      "Sky Emperor",
+      "job"
+    ]
+  },
+  {
+    "id": "소울-아센틱",
+    "term": "소울 아센틱",
+    "fullName": "소울 아센틱 (Soul Ascetic)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "소울리퍼 상위. 확장 4차",
+    "tags": [
+      "소울 아센틱",
+      "소울 아센틱 (Soul Ascetic)",
+      "Soul Ascetic",
+      "job"
+    ]
+  },
+  {
+    "id": "나호",
+    "term": "나호",
+    "fullName": "나이트 워치 (Night Watch)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "리벨리온 상위. 확장 4차",
+    "tags": [
+      "나호",
+      "나이트 워치 (Night Watch)",
+      "Night Watch",
+      "job"
+    ]
+  },
+  {
+    "id": "시라누이-시키가미",
+    "term": "시라누이/시키가미",
+    "fullName": "시라누이/시키가미 (Shinkiro/Shiranui)",
+    "category": "job",
+    "subcategory": "4차 직업",
+    "description": "닌자 계열 4차",
+    "tags": [
+      "시라누이/시키가미",
+      "시라누이/시키가미 (Shinkiro/Shiranui)",
+      "Shinkiro/Shiranui",
+      "Shinkiro",
+      "Shiranui",
+      "job"
+    ]
+  },
+  {
+    "id": "핵슬",
+    "term": "핵슬",
+    "fullName": "핵 엔드 슬래셔 (Hack and Slasher)",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "드래곤나이트 주력 광역 스킬/빌드",
+    "tags": [
+      "핵슬",
+      "핵 엔드 슬래셔 (Hack and Slasher)",
+      "Hack and Slasher",
+      "드래곤나이트",
+      "광역",
+      "job-build"
+    ]
+  },
+  {
+    "id": "폭화",
+    "term": "폭화",
+    "fullName": "폭렬화살 계열 빌드",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "윈드호크 화살 딜러",
+    "tags": [
+      "폭화",
+      "폭렬화살 계열 빌드",
+      "윈드호크",
+      "화살",
+      "job-build"
+    ]
+  },
+  {
+    "id": "마검",
+    "term": "마검",
+    "fullName": "마법검 빌드",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "쉐도우 체이서의 마법+단검 하이브리드",
+    "tags": [
+      "마검",
+      "마법검 빌드",
+      "쉐도우 체이서",
+      "job-build"
+    ]
+  },
+  {
+    "id": "마공",
+    "term": "마공",
+    "fullName": "마법 공격력",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "마법 딜러 계열 통칭",
+    "tags": [
+      "마공",
+      "마법 공격력",
+      "마법",
+      "딜러",
+      "job-build"
+    ]
+  },
+  {
+    "id": "물공",
+    "term": "물공",
+    "fullName": "물리 공격력",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "물리 딜러 계열 통칭",
+    "tags": [
+      "물공",
+      "물리 공격력",
+      "물리",
+      "딜러",
+      "job-build"
+    ]
+  },
+  {
+    "id": "근물",
+    "term": "근물",
+    "fullName": "근접 물리 딜러",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "근접 물리 딜러",
+    "tags": [
+      "근물",
+      "근접 물리 딜러",
+      "근접",
+      "물리",
+      "job-build"
+    ]
+  },
+  {
+    "id": "명물",
+    "term": "명물",
+    "fullName": "명중(DEX 의존) 물리 딜러",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "비크리 물리 딜러의 곱연산 요소",
+    "tags": [
+      "명물",
+      "명중(DEX 의존) 물리 딜러",
+      "DEX",
+      "명중",
+      "job-build"
+    ]
+  },
+  {
+    "id": "격수",
+    "term": "격수",
+    "fullName": "딜러",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "파티 내 공격 담당 역할",
+    "tags": [
+      "격수",
+      "딜러",
+      "파티",
+      "job-build"
+    ]
+  },
+  {
+    "id": "보프",
+    "term": "보프",
+    "fullName": "보조 프리스트",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "버프/힐 전담",
+    "tags": [
+      "보프",
+      "보조 프리스트",
+      "프리스트",
+      "버프",
+      "힐",
+      "job-build"
+    ]
+  },
+  {
+    "id": "전프",
+    "term": "전프",
+    "fullName": "전투 프리스트",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "공격형 프리스트",
+    "tags": [
+      "전프",
+      "전투 프리스트",
+      "프리스트",
+      "공격",
+      "job-build"
+    ]
+  },
+  {
+    "id": "턴언프리",
+    "term": "턴언프리",
+    "fullName": "턴 언데드 특화 프리스트",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "언데드 사냥 전문",
+    "tags": [
+      "턴언프리",
+      "턴 언데드 특화 프리스트",
+      "턴 언데드",
+      "프리스트",
+      "언데드",
+      "job-build"
+    ]
+  },
+  {
+    "id": "숍---서폿",
+    "term": "숍 / 서폿",
+    "fullName": "서포터 캐릭터",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "솔플 시 보조용으로 데리고 다니는 캐릭",
+    "tags": [
+      "숍 / 서폿",
+      "서포터 캐릭터",
+      "서포터",
+      "보조",
+      "job-build"
+    ]
+  },
+  {
+    "id": "탱커",
+    "term": "탱커",
+    "fullName": "몬스터 어그로를 받아주는 방어 담당",
+    "category": "job-build",
+    "subcategory": "",
+    "description": "몬스터 어그로를 받아주는 방어 담당",
+    "tags": [
+      "탱커",
+      "몬스터 어그로를 받아주는 방어 담당",
+      "방어",
+      "어그로",
+      "job-build"
+    ]
+  },
+  {
+    "id": "글레",
+    "term": "글레",
+    "fullName": "글레이시아 (Glaceia)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "가성비 장비 시리즈. 뉴비 필수. '11글레 무기' = +11 글레이시아",
+    "tags": [
+      "글레",
+      "글레이시아 (Glaceia)",
+      "Glaceia",
+      "가성비",
+      "뉴비",
+      "gear"
+    ]
+  },
+  {
+    "id": "딤글",
+    "term": "딤글",
+    "fullName": "디멘전즈 글레이시아",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "글레이시아 상위 버전",
+    "tags": [
+      "딤글",
+      "디멘전즈 글레이시아",
+      "글레이시아",
+      "gear"
+    ]
+  },
+  {
+    "id": "설화",
+    "term": "설화",
+    "fullName": "설화 세트",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "중급 방어구 세트. 글레+설화 = 뉴비 기본 세팅",
+    "tags": [
+      "설화",
+      "설화 세트",
+      "방어구",
+      "뉴비",
+      "gear"
+    ]
+  },
+  {
+    "id": "게오",
+    "term": "게오",
+    "fullName": "게오르그 세트",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "상위 장비 세트",
+    "tags": [
+      "게오",
+      "게오르그 세트",
+      "gear"
+    ]
+  },
+  {
+    "id": "타노스",
+    "term": "타노스",
+    "fullName": "타노스 투구 시리즈",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "범용 투구. 전사/투사/사수/마법 4종. 환승충 추천",
+    "tags": [
+      "타노스",
+      "타노스 투구 시리즈",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "진노",
+    "term": "진노",
+    "fullName": "진노 장비/세트",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "중상급 세트. '진노뚝' = 진노 뚝딱이(보조장비)",
+    "tags": [
+      "진노",
+      "진노 장비/세트",
+      "뚝딱이",
+      "gear"
+    ]
+  },
+  {
+    "id": "디멘",
+    "term": "디멘",
+    "fullName": "디멘전즈 장비",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "고급 시리즈. 글레→진노→디멘 업그레이드 경로",
+    "tags": [
+      "디멘",
+      "디멘전즈 장비",
+      "gear"
+    ]
+  },
+  {
+    "id": "해선망",
+    "term": "해선망",
+    "fullName": "해선망",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "크리 계열 필수 갑옷. 200~만렙까지 현역",
+    "tags": [
+      "해선망",
+      "크리",
+      "갑옷",
+      "gear"
+    ]
+  },
+  {
+    "id": "바르문트",
+    "term": "바르문트",
+    "fullName": "바르문트 장비 세트",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "현 엔드급. 바르문트 신발 = 종결 신발",
+    "tags": [
+      "바르문트",
+      "바르문트 장비 세트",
+      "엔드",
+      "신발",
+      "gear"
+    ]
+  },
+  {
+    "id": "성좌",
+    "term": "성좌",
+    "fullName": "성좌 갑옷",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "최종 엔드 갑옷. 귀속(거래 불가). 접어도 회수 불가",
+    "tags": [
+      "성좌",
+      "성좌 갑옷",
+      "엔드",
+      "갑옷",
+      "귀속",
+      "gear"
+    ]
+  },
+  {
+    "id": "선악",
+    "term": "선악",
+    "fullName": "선악의 관 + 선악 무기",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "종결 투구+무기 세트. 돌려쓰기 불가",
+    "tags": [
+      "선악",
+      "선악의 관 + 선악 무기",
+      "종결",
+      "투구",
+      "무기",
+      "gear"
+    ]
+  },
+  {
+    "id": "셀린느",
+    "term": "셀린느",
+    "fullName": "셀린느 세트 (리본/드레스/브로치)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "마공계 가성비 세트. 130~245까지 사용",
+    "tags": [
+      "셀린느",
+      "셀린느 세트 (리본/드레스/브로치)",
+      "마공",
+      "가성비",
+      "gear"
+    ]
+  },
+  {
+    "id": "시서클",
+    "term": "시서클",
+    "fullName": "시크릿 서클 (투구)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "상위 투구류",
+    "tags": [
+      "시서클",
+      "시크릿 서클 (투구)",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "전사모",
+    "term": "전사모",
+    "fullName": "전사의 모자 (투구)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "상위 투구류. '예기5 전사모' 등",
+    "tags": [
+      "전사모",
+      "전사의 모자 (투구)",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "서바",
+    "term": "서바",
+    "fullName": "서번트 투구",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "타노스 대안 투구류",
+    "tags": [
+      "서바",
+      "서번트 투구",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "보이타타",
+    "term": "보이타타",
+    "fullName": "보이타타 모자",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "상위 투구 옵션",
+    "tags": [
+      "보이타타",
+      "보이타타 모자",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "이스가르드",
+    "term": "이스가르드",
+    "fullName": "이스가르드 투구",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "마공 전용 투구. 변캐 부족 문제 있음",
+    "tags": [
+      "이스가르드",
+      "이스가르드 투구",
+      "마공",
+      "투구",
+      "gear"
+    ]
+  },
+  {
+    "id": "인피",
+    "term": "인피",
+    "fullName": "인피니티 (펜던트/이어링)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "물리 계열 필수 악세서리. '9인피' = +9 인피니티",
+    "tags": [
+      "인피",
+      "인피니티 (펜던트/이어링)",
+      "악세서리",
+      "물리",
+      "gear"
+    ]
+  },
+  {
+    "id": "매드바니",
+    "term": "매드바니",
+    "fullName": "매드바니 방패",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "물리 계열 방패. '10매드바니LT'",
+    "tags": [
+      "매드바니",
+      "매드바니 방패",
+      "방패",
+      "물리",
+      "gear"
+    ]
+  },
+  {
+    "id": "타천류",
+    "term": "타천류",
+    "fullName": "타천 계열 걸칠것(망토)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "고가 망토류",
+    "tags": [
+      "타천류",
+      "타천 계열 걸칠것(망토)",
+      "망토",
+      "gear"
+    ]
+  },
+  {
+    "id": "글로창",
+    "term": "글로창",
+    "fullName": "글로리어스 창",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "공성용 무기",
+    "tags": [
+      "글로창",
+      "글로리어스 창",
+      "공성",
+      "창",
+      "gear"
+    ]
+  },
+  {
+    "id": "레이첼",
+    "term": "레이첼",
+    "fullName": "레이첼 (카타르 무기)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "길크 최강 무기",
+    "tags": [
+      "레이첼",
+      "레이첼 (카타르 무기)",
+      "카타르",
+      "길크",
+      "gear"
+    ]
+  },
+  {
+    "id": "마도검",
+    "term": "마도검",
+    "fullName": "마도검 (단검)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "쉐체 종결 무기. 'LT' 버전",
+    "tags": [
+      "마도검",
+      "마도검 (단검)",
+      "단검",
+      "쉐체",
+      "gear"
+    ]
+  },
+  {
+    "id": "산양",
+    "term": "산양",
+    "fullName": "산양의 뿔 (창 무기)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "이그니션 룬나이트용",
+    "tags": [
+      "산양",
+      "산양의 뿔 (창 무기)",
+      "창",
+      "룬나이트",
+      "gear"
+    ]
+  },
+  {
+    "id": "볼라르",
+    "term": "볼라르",
+    "fullName": "볼라르 (방패)",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "산양+볼라르 세트",
+    "tags": [
+      "볼라르",
+      "볼라르 (방패)",
+      "방패",
+      "gear"
+    ]
+  },
+  {
+    "id": "기사단",
+    "term": "기사단",
+    "fullName": "기사단 카타르",
+    "category": "gear",
+    "subcategory": "장비 시리즈",
+    "description": "'15더블기사단' = +15 더블 기사단 카타르",
+    "tags": [
+      "기사단",
+      "기사단 카타르",
+      "카타르",
+      "gear"
+    ]
+  },
+  {
+    "id": "앞판",
+    "term": "앞판",
+    "fullName": "기본 장비 슬롯",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "투구/갑옷/무기/방패/신발/망토/악세",
+    "tags": [
+      "앞판",
+      "기본 장비 슬롯",
+      "장비 슬롯",
+      "gear"
+    ]
+  },
+  {
+    "id": "뒷판",
+    "term": "뒷판",
+    "fullName": "쉐도우 장비 6부위 통칭",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "방무·페널티 삭제 등 핵심 옵션",
+    "tags": [
+      "뒷판",
+      "쉐도우 장비 6부위 통칭",
+      "쉐도우",
+      "gear"
+    ]
+  },
+  {
+    "id": "쉐도우",
+    "term": "쉐도우",
+    "fullName": "보조 장비 슬롯",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "기본 방어구 위에 추가 장착하는 보조 장비 슬롯",
+    "tags": [
+      "쉐도우",
+      "보조 장비 슬롯",
+      "gear"
+    ]
+  },
+  {
+    "id": "템페",
+    "term": "템페",
+    "fullName": "템페스트 쉐도우",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "'풀템페' = 풀세트",
+    "tags": [
+      "템페",
+      "템페스트 쉐도우",
+      "쉐도우",
+      "gear"
+    ]
+  },
+  {
+    "id": "페니",
+    "term": "페니",
+    "fullName": "페니텐시아 쉐도우",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "'풀페니' = 풀세트. 방무 핵심",
+    "tags": [
+      "페니",
+      "페니텐시아 쉐도우",
+      "쉐도우",
+      "방무",
+      "gear"
+    ]
+  },
+  {
+    "id": "마스터셋",
+    "term": "마스터셋",
+    "fullName": "마스터 쉐도우 세트",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "기본 뒷판",
+    "tags": [
+      "마스터셋",
+      "마스터 쉐도우 세트",
+      "쉐도우",
+      "gear"
+    ]
+  },
+  {
+    "id": "뚝딱이-디뚝",
+    "term": "뚝딱이/디뚝",
+    "fullName": "뚝딱이(보조장비)",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "'이스뚝' = 이스 뚝딱이, '인퀴셋디뚝' 등",
+    "tags": [
+      "뚝딱이/디뚝",
+      "뚝딱이(보조장비)",
+      "보조장비",
+      "gear"
+    ]
+  },
+  {
+    "id": "의상",
+    "term": "의상",
+    "fullName": "코스튬 장비",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "외형 + 추가 옵션. 의상스톤으로 인첸트",
+    "tags": [
+      "의상",
+      "코스튬 장비",
+      "코스튬",
+      "gear"
+    ]
+  },
+  {
+    "id": "의상스톤",
+    "term": "의상스톤",
+    "fullName": "의상에 인첸트하는 보석류 아이템",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "의상에 인첸트하는 보석류 아이템",
+    "tags": [
+      "의상스톤",
+      "의상에 인첸트하는 보석류 아이템",
+      "인첸트",
+      "gear"
+    ]
+  },
+  {
+    "id": "걸칠것",
+    "term": "걸칠것",
+    "fullName": "망토/가먼트 통칭",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "망토/가먼트 통칭",
+    "tags": [
+      "걸칠것",
+      "망토/가먼트 통칭",
+      "망토",
+      "가먼트",
+      "gear"
+    ]
+  },
+  {
+    "id": "갑빠",
+    "term": "갑빠",
+    "fullName": "갑옷 강화치",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "갑옷 + 숫자. '갑빠 9강' = 갑옷 +9",
+    "tags": [
+      "갑빠",
+      "갑옷 강화치",
+      "갑옷",
+      "강화",
+      "gear"
+    ]
+  },
+  {
+    "id": "고삐",
+    "term": "고삐",
+    "fullName": "고삐(탈것 아이템)",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "이동속도 증가. '고삐 영구제'",
+    "tags": [
+      "고삐",
+      "고삐(탈것 아이템)",
+      "탈것",
+      "이동속도",
+      "gear"
+    ]
+  },
+  {
+    "id": "펫-잡펫",
+    "term": "펫/잡펫",
+    "fullName": "펫 시스템",
+    "category": "gear",
+    "subcategory": "장비 부위·시스템",
+    "description": "전투/보조 효과",
+    "tags": [
+      "펫/잡펫",
+      "펫 시스템",
+      "펫",
+      "gear"
+    ]
+  },
+  {
+    "id": "plus-숫자-예:-plus-11-11강",
+    "term": "+숫자 (예: +11, 11강)",
+    "fullName": "제련 강화 수치",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "11글레 = +11 글레이시아",
+    "tags": [
+      "+숫자 (예: +11, 11강)",
+      "제련 강화 수치",
+      "제련",
+      "강화",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "a-b-c-s",
+    "term": "A/B/C/S",
+    "fullName": "장비 등급",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "'12A' = +12 강화 A등급",
+    "tags": [
+      "A/B/C/S",
+      "장비 등급",
+      "등급",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "lt",
+    "term": "LT",
+    "fullName": "리미티드 (Limited)",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "상위/한정 버전 접미사",
+    "tags": [
+      "LT",
+      "리미티드 (Limited)",
+      "Limited",
+      "한정",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "os",
+    "term": "OS",
+    "fullName": "오버사이즈",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "특정 장비 시리즈 약칭",
+    "tags": [
+      "OS",
+      "오버사이즈",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "풀",
+    "term": "풀~",
+    "fullName": "풀세트/풀인첸트/풀강화 상태",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "'풀페니' '풀작'",
+    "tags": [
+      "풀~",
+      "풀세트/풀인첸트/풀강화 상태",
+      "풀세트",
+      "풀인첸트",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "귀속",
+    "term": "귀속",
+    "fullName": "거래 불가 장비",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "접어도 회수 못함",
+    "tags": [
+      "귀속",
+      "거래 불가 장비",
+      "거래불가",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "개방",
+    "term": "개방",
+    "fullName": "교환 가능 버전의 장비",
+    "category": "gear-prefix",
+    "subcategory": "",
+    "description": "귀속 반대",
+    "tags": [
+      "개방",
+      "교환 가능 버전의 장비",
+      "교환",
+      "gear-prefix"
+    ]
+  },
+  {
+    "id": "컨버터",
+    "term": "컨버터",
+    "fullName": "엘레멘탈 컨버터",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "무기에 속성 부여하는 소모품. '초록 컨버터' = 풍속성",
+    "tags": [
+      "컨버터",
+      "엘레멘탈 컨버터",
+      "속성",
+      "소모품",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "속성석",
+    "term": "속성석",
+    "fullName": "속성 부여 재료 아이템",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "속성 부여 재료 아이템",
+    "tags": [
+      "속성석",
+      "속성 부여 재료 아이템",
+      "속성",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "교범",
+    "term": "교범",
+    "fullName": "전투 교범",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "경험치 획득 증가 캐쉬 아이템. '고급 전투교범'",
+    "tags": [
+      "교범",
+      "전투 교범",
+      "경험치",
+      "캐쉬",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "생명수",
+    "term": "생명수",
+    "fullName": "HP 자동 회복 캐쉬 아이템",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "고렙 사냥 필수",
+    "tags": [
+      "생명수",
+      "HP 자동 회복 캐쉬 아이템",
+      "HP",
+      "캐쉬",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "나비",
+    "term": "나비",
+    "fullName": "나비의 날개",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "귀환 아이템. '나비 타면' = 귀환하면",
+    "tags": [
+      "나비",
+      "나비의 날개",
+      "귀환",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "룬",
+    "term": "룬",
+    "fullName": "룬 나이트·드래곤 나이트 전용 소비 아이템",
+    "category": "gear-consumable",
+    "subcategory": "",
+    "description": "룬값 = 사냥 유지비",
+    "tags": [
+      "룬",
+      "룬 나이트·드래곤 나이트 전용 소비 아이템",
+      "룬 나이트",
+      "드래곤 나이트",
+      "gear-consumable"
+    ]
+  },
+  {
+    "id": "제련",
+    "term": "제련",
+    "fullName": "장비 +수치 올리는 시스템",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "+20까지 가능",
+    "tags": [
+      "제련",
+      "장비 +수치 올리는 시스템",
+      "강화",
+      "system"
+    ]
+  },
+  {
+    "id": "깡제련",
+    "term": "깡제련",
+    "fullName": "보호 아이템 없이 제련",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "실패=파괴 각오",
+    "tags": [
+      "깡제련",
+      "보호 아이템 없이 제련",
+      "제련",
+      "system"
+    ]
+  },
+  {
+    "id": "직작",
+    "term": "직작",
+    "fullName": "직접 제작",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "재료부터 모아 직접 만듦",
+    "tags": [
+      "직작",
+      "직접 제작",
+      "제작",
+      "system"
+    ]
+  },
+  {
+    "id": "풀작",
+    "term": "풀작",
+    "fullName": "풀 제작/풀 인첸트",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "모든 옵션 완성 상태",
+    "tags": [
+      "풀작",
+      "풀 제작/풀 인첸트",
+      "인첸트",
+      "제작",
+      "system"
+    ]
+  },
+  {
+    "id": "인첸-인첸트",
+    "term": "인첸/인첸트",
+    "fullName": "장비에 추가 옵션 부여",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "'인첸 3레벨' = 3단계 인첸트",
+    "tags": [
+      "인첸/인첸트",
+      "장비에 추가 옵션 부여",
+      "인첸트",
+      "옵션",
+      "system"
+    ]
+  },
+  {
+    "id": "노인챈",
+    "term": "노인챈",
+    "fullName": "인첸트 안 한 상태",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "'디뚝 노인챈'",
+    "tags": [
+      "노인챈",
+      "인첸트 안 한 상태",
+      "인첸트",
+      "system"
+    ]
+  },
+  {
+    "id": "등급-등급업",
+    "term": "등급/등급업",
+    "fullName": "C→B→A→S 장비 등급 시스템",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "C→B→A→S 장비 등급 시스템",
+    "tags": [
+      "등급/등급업",
+      "C→B→A→S 장비 등급 시스템",
+      "등급",
+      "system"
+    ]
+  },
+  {
+    "id": "고캐작",
+    "term": "고캐작",
+    "fullName": "고정 캐스팅 감소 인첸트 제작",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "고정 캐스팅 감소 인첸트 제작",
+    "tags": [
+      "고캐작",
+      "고정 캐스팅 감소 인첸트 제작",
+      "고정 캐스팅",
+      "인첸트",
+      "system"
+    ]
+  },
+  {
+    "id": "망작",
+    "term": "망작",
+    "fullName": "망토 제작/인첸트",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "망토 제작/인첸트",
+    "tags": [
+      "망작",
+      "망토 제작/인첸트",
+      "망토",
+      "인첸트",
+      "system"
+    ]
+  },
+  {
+    "id": "풀작-2",
+    "term": "풀작",
+    "fullName": "인첸트 모두 완료 상태",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "인첸트 모두 완료 상태",
+    "tags": [
+      "풀작-시스템",
+      "인첸트 모두 완료 상태",
+      "인첸트",
+      "system"
+    ]
+  },
+  {
+    "id": "제련이벤",
+    "term": "제련이벤",
+    "fullName": "제련 성공률 상승 이벤트 기간",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "제련 성공률 상승 이벤트 기간",
+    "tags": [
+      "제련이벤",
+      "제련 성공률 상승 이벤트 기간",
+      "제련",
+      "이벤트",
+      "system"
+    ]
+  },
+  {
+    "id": "제련망치",
+    "term": "제련망치",
+    "fullName": "쉐도우 장비 제련용 특수 아이템",
+    "category": "system",
+    "subcategory": "제련·강화",
+    "description": "쉐도우 장비 제련용 특수 아이템",
+    "tags": [
+      "제련망치",
+      "쉐도우 장비 제련용 특수 아이템",
+      "쉐도우",
+      "제련",
+      "system"
+    ]
+  },
+  {
+    "id": "전승",
+    "term": "전승",
+    "fullName": "베이스 레벨 99에서 상위 직업으로 전환",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "전승비용 ~120만 제니",
+    "tags": [
+      "전승",
+      "베이스 레벨 99에서 상위 직업으로 전환",
+      "레벨",
+      "전직",
+      "system"
+    ]
+  },
+  {
+    "id": "전직",
+    "term": "전직",
+    "fullName": "직업 변경",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "1차→2차→3차→4차",
+    "tags": [
+      "전직",
+      "직업 변경",
+      "직업",
+      "system"
+    ]
+  },
+  {
+    "id": "칼전직",
+    "term": "칼전직",
+    "fullName": "잡렙을 최소만 찍고 바로 전직하는 것",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "잡렙을 최소만 찍고 바로 전직하는 것",
+    "tags": [
+      "칼전직",
+      "잡렙을 최소만 찍고 바로 전직하는 것",
+      "전직",
+      "system"
+    ]
+  },
+  {
+    "id": "베렙",
+    "term": "베렙",
+    "fullName": "베이스 레벨 (Base Level)",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "능력치 포인트",
+    "tags": [
+      "베렙",
+      "베이스 레벨 (Base Level)",
+      "Base Level",
+      "레벨",
+      "system"
+    ]
+  },
+  {
+    "id": "잡렙",
+    "term": "잡렙",
+    "fullName": "잡 레벨 (Job Level)",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "스킬 포인트",
+    "tags": [
+      "잡렙",
+      "잡 레벨 (Job Level)",
+      "Job Level",
+      "레벨",
+      "system"
+    ]
+  },
+  {
+    "id": "렙---렙업",
+    "term": "렙 / 렙업",
+    "fullName": "레벨 / 레벨업",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "레벨 / 레벨업",
+    "tags": [
+      "렙 / 렙업",
+      "레벨 / 레벨업",
+      "레벨",
+      "system"
+    ]
+  },
+  {
+    "id": "만렙",
+    "term": "만렙",
+    "fullName": "최대 레벨",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "현재 4차 기준 250",
+    "tags": [
+      "만렙",
+      "최대 레벨",
+      "레벨",
+      "250",
+      "system"
+    ]
+  },
+  {
+    "id": "스탯---스테",
+    "term": "스탯 / 스테",
+    "fullName": "스테이터스. 능력치 배분",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "스테이터스. 능력치 배분",
+    "tags": [
+      "스탯 / 스테",
+      "스테이터스. 능력치 배분",
+      "능력치",
+      "system"
+    ]
+  },
+  {
+    "id": "스킬트리",
+    "term": "스킬트리",
+    "fullName": "스킬 포인트 배분 구조",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "스킬 포인트 배분 구조",
+    "tags": [
+      "스킬트리",
+      "스킬 포인트 배분 구조",
+      "스킬",
+      "system"
+    ]
+  },
+  {
+    "id": "쩔---알바",
+    "term": "쩔 / 알바",
+    "fullName": "고레벨이 저레벨 경험치 올려주는 행위",
+    "category": "system",
+    "subcategory": "캐릭터 성장",
+    "description": "리뉴얼 이후 비효율",
+    "tags": [
+      "쩔 / 알바",
+      "고레벨이 저레벨 경험치 올려주는 행위",
+      "경험치",
+      "레벨링",
+      "system"
+    ]
+  },
+  {
+    "id": "프모",
+    "term": "프모",
+    "fullName": "프로모션 캐릭터",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "부스터콜 등 혜택. 장비·의상 지원",
+    "tags": [
+      "프모",
+      "프로모션 캐릭터",
+      "프로모션",
+      "system"
+    ]
+  },
+  {
+    "id": "비프모",
+    "term": "비프모",
+    "fullName": "비(非)프로모션",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "일반 캐릭터. 초기 혜택 적음",
+    "tags": [
+      "비프모",
+      "비(非)프로모션",
+      "프로모션",
+      "system"
+    ]
+  },
+  {
+    "id": "부스터콜",
+    "term": "부스터콜",
+    "fullName": "프모 전용 성장 지원 미션 시스템",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "프모 전용 성장 지원 미션 시스템",
+    "tags": [
+      "부스터콜",
+      "프모 전용 성장 지원 미션 시스템",
+      "프모",
+      "미션",
+      "system"
+    ]
+  },
+  {
+    "id": "부스터코인",
+    "term": "부스터코인",
+    "fullName": "부스터콜 미션 보상 화폐",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "부스터콜 미션 보상 화폐",
+    "tags": [
+      "부스터코인",
+      "부스터콜 미션 보상 화폐",
+      "부스터콜",
+      "system"
+    ]
+  },
+  {
+    "id": "냥다래",
+    "term": "냥다래",
+    "fullName": "캐쉬 화폐/패스",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "'냥다래 패스 끊어서' = 유료 패스 구매",
+    "tags": [
+      "냥다래",
+      "캐쉬 화폐/패스",
+      "캐쉬",
+      "패스",
+      "system"
+    ]
+  },
+  {
+    "id": "복화술사",
+    "term": "복화술사",
+    "fullName": "무료 스킬/스탯 초기화 NPC",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "이벤트로 한시적 등장",
+    "tags": [
+      "복화술사",
+      "무료 스킬/스탯 초기화 NPC",
+      "초기화",
+      "NPC",
+      "system"
+    ]
+  },
+  {
+    "id": "카프라",
+    "term": "카프라",
+    "fullName": "카프라 서비스",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "창고/워프 NPC",
+    "tags": [
+      "카프라",
+      "카프라 서비스",
+      "NPC",
+      "창고",
+      "워프",
+      "system"
+    ]
+  },
+  {
+    "id": "매니아",
+    "term": "매니아",
+    "fullName": "라그 매니아 서버",
+    "category": "system",
+    "subcategory": "서버·계정",
+    "description": "구 서버명",
+    "tags": [
+      "매니아",
+      "라그 매니아 서버",
+      "서버",
+      "system"
+    ]
+  },
+  {
+    "id": "각팟---각파티",
+    "term": "각팟 / 각파티",
+    "fullName": "버프 받고 각자 흩어져 사냥하는 파티 구조",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "버프 받고 각자 흩어져 사냥하는 파티 구조",
+    "tags": [
+      "각팟 / 각파티",
+      "버프 받고 각자 흩어져 사냥하는 파티 구조",
+      "파티",
+      "버프",
+      "system"
+    ]
+  },
+  {
+    "id": "거파",
+    "term": "거파",
+    "fullName": "게더 파티(소환)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "비숍/카디날이 파티원을 소환하는 스킬",
+    "tags": [
+      "거파",
+      "게더 파티(소환)",
+      "소환",
+      "파티",
+      "system"
+    ]
+  },
+  {
+    "id": "민블",
+    "term": "민블",
+    "fullName": "민첩성 증가 + 블레싱",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "기본 버프 세트",
+    "tags": [
+      "민블",
+      "민첩성 증가 + 블레싱",
+      "버프",
+      "system"
+    ]
+  },
+  {
+    "id": "민블탐",
+    "term": "민블탐",
+    "fullName": "민블 + 크리투라 아카데미 탐색",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "버프 갱신 주기 (약 4분)",
+    "tags": [
+      "민블탐",
+      "민블 + 크리투라 아카데미 탐색",
+      "버프",
+      "system"
+    ]
+  },
+  {
+    "id": "1숍plus-11격수",
+    "term": "1숍+11격수",
+    "fullName": "파티 구성",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "서포터 1명 + 딜러 11명",
+    "tags": [
+      "1숍+11격수",
+      "파티 구성",
+      "파티",
+      "system"
+    ]
+  },
+  {
+    "id": "증뎀",
+    "term": "증뎀",
+    "fullName": "데미지 증가 (%)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "종족/크기/속성 증뎀",
+    "tags": [
+      "증뎀",
+      "데미지 증가 (%)",
+      "데미지",
+      "system"
+    ]
+  },
+  {
+    "id": "방무",
+    "term": "방무",
+    "fullName": "방어력 무시 (%)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "'방무 100' = 100% 무시. 딜러 필수",
+    "tags": [
+      "방무",
+      "방어력 무시 (%)",
+      "방어력",
+      "system"
+    ]
+  },
+  {
+    "id": "고캐",
+    "term": "고캐",
+    "fullName": "고정 캐스팅 (Fixed Cast)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "줄일 수 없는 시전 시간 부분",
+    "tags": [
+      "고캐",
+      "고정 캐스팅 (Fixed Cast)",
+      "Fixed Cast",
+      "캐스팅",
+      "system"
+    ]
+  },
+  {
+    "id": "변캐",
+    "term": "변캐",
+    "fullName": "변동 캐스팅 (Variable Cast)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "장비/DEX로 줄일 수 있는 시전 시간",
+    "tags": [
+      "변캐",
+      "변동 캐스팅 (Variable Cast)",
+      "Variable Cast",
+      "캐스팅",
+      "system"
+    ]
+  },
+  {
+    "id": "글쿨",
+    "term": "글쿨",
+    "fullName": "글로벌 쿨타임",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "글로벌 쿨타임",
+    "tags": [
+      "글쿨",
+      "글로벌 쿨타임",
+      "쿨타임",
+      "system"
+    ]
+  },
+  {
+    "id": "공속",
+    "term": "공속",
+    "fullName": "공격 속도 (ASPD)",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "193이 사실상 상한",
+    "tags": [
+      "공속",
+      "공격 속도 (ASPD)",
+      "ASPD",
+      "system"
+    ]
+  },
+  {
+    "id": "크리",
+    "term": "크리",
+    "fullName": "크리티컬 공격",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "'크리 직업' = 크리 빌드 직업",
+    "tags": [
+      "크리",
+      "크리티컬 공격",
+      "크리티컬",
+      "system"
+    ]
+  },
+  {
+    "id": "무캐",
+    "term": "무캐",
+    "fullName": "무(無) 캐스팅",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "시전 시간 0 상태",
+    "tags": [
+      "무캐",
+      "무(無) 캐스팅",
+      "캐스팅",
+      "system"
+    ]
+  },
+  {
+    "id": "곱연산",
+    "term": "곱연산",
+    "fullName": "곱하기로 적용되는 데미지 증가 요소",
+    "category": "system",
+    "subcategory": "전투·파티",
+    "description": "합연산 대비 효율 좋음",
+    "tags": [
+      "곱연산",
+      "곱하기로 적용되는 데미지 증가 요소",
+      "데미지",
+      "연산",
+      "system"
+    ]
+  },
+  {
+    "id": "힘-str",
+    "term": "힘 (STR)",
+    "fullName": "물리 공격력. 근접 물공",
+    "category": "stat",
+    "subcategory": "",
+    "description": "물리 공격력. 근접 물공",
+    "tags": [
+      "힘 (STR)",
+      "물리 공격력. 근접 물공",
+      "STR",
+      "물리",
+      "stat"
+    ]
+  },
+  {
+    "id": "어질-agi",
+    "term": "어질 (AGI)",
+    "fullName": "공격속도·회피",
+    "category": "stat",
+    "subcategory": "",
+    "description": "공격속도·회피",
+    "tags": [
+      "어질 (AGI)",
+      "공격속도·회피",
+      "AGI",
+      "공격속도",
+      "회피",
+      "stat"
+    ]
+  },
+  {
+    "id": "인트-int",
+    "term": "인트 (INT)",
+    "fullName": "마법 공격력·SP",
+    "category": "stat",
+    "subcategory": "",
+    "description": "마법 공격력·SP",
+    "tags": [
+      "인트 (INT)",
+      "마법 공격력·SP",
+      "INT",
+      "마법",
+      "SP",
+      "stat"
+    ]
+  },
+  {
+    "id": "덱스-dex",
+    "term": "덱스 (DEX)",
+    "fullName": "명중·변동캐스팅 감소",
+    "category": "stat",
+    "subcategory": "",
+    "description": "명중·변동캐스팅 감소",
+    "tags": [
+      "덱스 (DEX)",
+      "명중·변동캐스팅 감소",
+      "DEX",
+      "명중",
+      "stat"
+    ]
+  },
+  {
+    "id": "럭-luk",
+    "term": "럭 (LUK)",
+    "fullName": "크리티컬·완전회피",
+    "category": "stat",
+    "subcategory": "",
+    "description": "크리티컬·완전회피",
+    "tags": [
+      "럭 (LUK)",
+      "크리티컬·완전회피",
+      "LUK",
+      "크리티컬",
+      "stat"
+    ]
+  },
+  {
+    "id": "바탈-바이탈-vit",
+    "term": "바탈/바이탈 (VIT)",
+    "fullName": "HP·상태이상 내성",
+    "category": "stat",
+    "subcategory": "",
+    "description": "HP·상태이상 내성",
+    "tags": [
+      "바탈/바이탈 (VIT)",
+      "HP·상태이상 내성",
+      "VIT",
+      "HP",
+      "stat"
+    ]
+  },
+  {
+    "id": "예기",
+    "term": "예기",
+    "fullName": "예지력 스탯",
+    "category": "stat",
+    "subcategory": "",
+    "description": "고레벨 추가 스탯",
+    "tags": [
+      "예기",
+      "예지력 스탯",
+      "예지력",
+      "stat"
+    ]
+  },
+  {
+    "id": "행운",
+    "term": "행운",
+    "fullName": "행운 스탯",
+    "category": "stat",
+    "subcategory": "",
+    "description": "고레벨 추가 스탯",
+    "tags": [
+      "행운",
+      "행운 스탯",
+      "stat"
+    ]
+  },
+  {
+    "id": "제니-zeny",
+    "term": "제니 (Zeny)",
+    "fullName": "게임 내 화폐 단위",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "게임 내 화폐 단위",
+    "tags": [
+      "제니 (Zeny)",
+      "게임 내 화폐 단위",
+      "Zeny",
+      "화폐",
+      "system"
+    ]
+  },
+  {
+    "id": "노인챈-40억",
+    "term": "노인챈 40억",
+    "fullName": "40억 제니 소모 (인첸트 없이)",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "40억 제니 소모 (인첸트 없이)",
+    "tags": [
+      "노인챈 40억",
+      "40억 제니 소모 (인첸트 없이)",
+      "제니",
+      "인첸트",
+      "system"
+    ]
+  },
+  {
+    "id": "시세",
+    "term": "시세",
+    "fullName": "아이템 거래 시장 가격",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "아이템 거래 시장 가격",
+    "tags": [
+      "시세",
+      "아이템 거래 시장 가격",
+      "거래",
+      "가격",
+      "system"
+    ]
+  },
+  {
+    "id": "노점",
+    "term": "노점",
+    "fullName": "개인 상점 (Vending)",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "캐릭터가 직접 여는 판매/구매 상점",
+    "tags": [
+      "노점",
+      "개인 상점 (Vending)",
+      "Vending",
+      "상점",
+      "system"
+    ]
+  },
+  {
+    "id": "잡템",
+    "term": "잡템",
+    "fullName": "몬스터 드롭 잡다한 아이템",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "NPC 판매용",
+    "tags": [
+      "잡템",
+      "몬스터 드롭 잡다한 아이템",
+      "드롭",
+      "아이템",
+      "system"
+    ]
+  },
+  {
+    "id": "드랍률",
+    "term": "드랍률",
+    "fullName": "아이템 드롭 확률",
+    "category": "system",
+    "subcategory": "화폐·경제",
+    "description": "아이템 드롭 확률",
+    "tags": [
+      "드랍률",
+      "아이템 드롭 확률",
+      "드롭",
+      "확률",
+      "system"
+    ]
+  },
+  {
+    "id": "낙단",
+    "term": "낙단",
+    "fullName": "낙원단 (Paradise Group)",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "뉴비 지원 NPC/시스템. 장비·퀘스트 제공",
+    "tags": [
+      "낙단",
+      "낙원단 (Paradise Group)",
+      "Paradise Group",
+      "뉴비",
+      "place"
+    ]
+  },
+  {
+    "id": "낙퀘",
+    "term": "낙퀘",
+    "fullName": "낙원단 퀘스트",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "뉴비 레벨업 핵심 루트",
+    "tags": [
+      "낙퀘",
+      "낙원단 퀘스트",
+      "낙원단",
+      "퀘스트",
+      "place"
+    ]
+  },
+  {
+    "id": "낙단템",
+    "term": "낙단템",
+    "fullName": "낙원단 지급 장비",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "낙원단 지급 장비",
+    "tags": [
+      "낙단템",
+      "낙원단 지급 장비",
+      "낙원단",
+      "장비",
+      "place"
+    ]
+  },
+  {
+    "id": "심층",
+    "term": "심층",
+    "fullName": "심층 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "고레벨 사냥터",
+    "tags": [
+      "심층",
+      "심층 던전",
+      "던전",
+      "place"
+    ]
+  },
+  {
+    "id": "어비스",
+    "term": "어비스",
+    "fullName": "어비스 인스턴스 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "고레벨 인던",
+    "tags": [
+      "어비스",
+      "어비스 인스턴스 던전",
+      "던전",
+      "인던",
+      "place"
+    ]
+  },
+  {
+    "id": "성좌-인던",
+    "term": "성좌 인던",
+    "fullName": "성좌 인스턴스 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "풀파티 기믹 수행형 보스전",
+    "tags": [
+      "성좌 인던",
+      "성좌 인스턴스 던전",
+      "인던",
+      "보스",
+      "place"
+    ]
+  },
+  {
+    "id": "공성",
+    "term": "공성",
+    "fullName": "공성전 (Guild War/Siege)",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "길드 단위 PvP",
+    "tags": [
+      "공성",
+      "공성전 (Guild War/Siege)",
+      "Guild War/Siege",
+      "Guild War",
+      "Siege",
+      "PvP",
+      "place"
+    ]
+  },
+  {
+    "id": "프론",
+    "term": "프론",
+    "fullName": "프론테라",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "주요 마을",
+    "tags": [
+      "프론",
+      "프론테라",
+      "place"
+    ]
+  },
+  {
+    "id": "이즈",
+    "term": "이즈",
+    "fullName": "이즈루드",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "주요 마을",
+    "tags": [
+      "이즈",
+      "이즈루드",
+      "place"
+    ]
+  },
+  {
+    "id": "알베",
+    "term": "알베",
+    "fullName": "알베르타",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "상인 길드 소재 마을",
+    "tags": [
+      "알베",
+      "알베르타",
+      "place"
+    ]
+  },
+  {
+    "id": "아인",
+    "term": "아인",
+    "fullName": "아인브로크",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "공업 도시",
+    "tags": [
+      "아인",
+      "아인브로크",
+      "place"
+    ]
+  },
+  {
+    "id": "리히",
+    "term": "리히",
+    "fullName": "리히타르젠",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "연구소 도시",
+    "tags": [
+      "리히",
+      "리히타르젠",
+      "place"
+    ]
+  },
+  {
+    "id": "모로크-모로",
+    "term": "모로크/모로",
+    "fullName": "모로크",
+    "category": "place",
+    "subcategory": "마을",
+    "description": "사막 마을",
+    "tags": [
+      "모로크/모로",
+      "모로크",
+      "place"
+    ]
+  },
+  {
+    "id": "구양궁",
+    "term": "구양궁",
+    "fullName": "구양궁 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "150~170 레벨링",
+    "tags": [
+      "구양궁",
+      "구양궁 던전",
+      "던전",
+      "레벨링",
+      "place"
+    ]
+  },
+  {
+    "id": "루완다",
+    "term": "루완다",
+    "fullName": "일루전 루완다",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "160~170 레벨링",
+    "tags": [
+      "루완다",
+      "일루전 루완다",
+      "일루전",
+      "레벨링",
+      "place"
+    ]
+  },
+  {
+    "id": "환영조사단",
+    "term": "환영조사단",
+    "fullName": "환영조사단 퀘스트",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "레벨업 필수 퀘",
+    "tags": [
+      "환영조사단",
+      "환영조사단 퀘스트",
+      "퀘스트",
+      "레벨업",
+      "place"
+    ]
+  },
+  {
+    "id": "일루전",
+    "term": "일루전",
+    "fullName": "일루전 시리즈 사냥터",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "'일루전 테디베어' 등",
+    "tags": [
+      "일루전",
+      "일루전 시리즈 사냥터",
+      "사냥터",
+      "place"
+    ]
+  },
+  {
+    "id": "전무",
+    "term": "전무",
+    "fullName": "전사자의 무덤",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "돈벌이 사냥터",
+    "tags": [
+      "전무",
+      "전사자의 무덤",
+      "사냥터",
+      "제니",
+      "place"
+    ]
+  },
+  {
+    "id": "배럭",
+    "term": "배럭",
+    "fullName": "배럭 (Barracks)",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "인던 종류",
+    "tags": [
+      "배럭",
+      "배럭 (Barracks)",
+      "Barracks",
+      "인던",
+      "place"
+    ]
+  },
+  {
+    "id": "md---인던",
+    "term": "MD / 인던",
+    "fullName": "메모리얼 던전 / 인스턴스 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "메모리얼 던전 / 인스턴스 던전",
+    "tags": [
+      "MD / 인던",
+      "메모리얼 던전 / 인스턴스 던전",
+      "인던",
+      "메모리얼",
+      "place"
+    ]
+  },
+  {
+    "id": "문라이트",
+    "term": "문라이트",
+    "fullName": "문라이트 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "부스터콜 미션",
+    "tags": [
+      "문라이트",
+      "문라이트 던전",
+      "던전",
+      "부스터콜",
+      "place"
+    ]
+  },
+  {
+    "id": "프로즌",
+    "term": "프로즌",
+    "fullName": "프로즌 던전",
+    "category": "place",
+    "subcategory": "사냥터/던전",
+    "description": "부스터콜 미션",
+    "tags": [
+      "프로즌",
+      "프로즌 던전",
+      "던전",
+      "부스터콜",
+      "place"
+    ]
+  },
+  {
+    "id": "종결-종결템",
+    "term": "종결/종결템",
+    "fullName": "해당 부위 최고 장비 (Best in Slot)",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "해당 부위 최고 장비 (Best in Slot)",
+    "tags": [
+      "종결/종결템",
+      "해당 부위 최고 장비 (Best in Slot)",
+      "Best in Slot",
+      "BiS",
+      "slang"
+    ]
+  },
+  {
+    "id": "엔드-엔드스펙",
+    "term": "엔드/엔드스펙",
+    "fullName": "최종 사양",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "더 올릴 곳이 거의 없는 장비 구성",
+    "tags": [
+      "엔드/엔드스펙",
+      "최종 사양",
+      "스펙",
+      "slang"
+    ]
+  },
+  {
+    "id": "부엉이-바위",
+    "term": "부엉이 바위",
+    "fullName": "구시대 템/폐급",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "'부엉이 바위 간 템' = 쓸모없어진 장비",
+    "tags": [
+      "부엉이 바위",
+      "구시대 템/폐급",
+      "slang"
+    ]
+  },
+  {
+    "id": "설거지",
+    "term": "설거지",
+    "fullName": "비싸게 사서 가치 떨어진 후 손해 보며 파는 것",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "비싸게 사서 가치 떨어진 후 손해 보며 파는 것",
+    "tags": [
+      "설거지",
+      "비싸게 사서 가치 떨어진 후 손해 보며 파는 것",
+      "손해",
+      "slang"
+    ]
+  },
+  {
+    "id": "급처상",
+    "term": "급처상",
+    "fullName": "급처분 상인",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "급하게 싸게 파는 것/유저",
+    "tags": [
+      "급처상",
+      "급처분 상인",
+      "slang"
+    ]
+  },
+  {
+    "id": "현질",
+    "term": "현질",
+    "fullName": "현금 결제 (Cash Shop)",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "현금 결제 (Cash Shop)",
+    "tags": [
+      "현질",
+      "현금 결제 (Cash Shop)",
+      "Cash Shop",
+      "결제",
+      "slang"
+    ]
+  },
+  {
+    "id": "무과금-무자본",
+    "term": "무과금/무자본",
+    "fullName": "현금 결제 없이 플레이",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "현금 결제 없이 플레이",
+    "tags": [
+      "무과금/무자본",
+      "현금 결제 없이 플레이",
+      "무과금",
+      "slang"
+    ]
+  },
+  {
+    "id": "접다-접기",
+    "term": "접다/접기",
+    "fullName": "게임을 그만두다",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "은퇴",
+    "tags": [
+      "접다/접기",
+      "게임을 그만두다",
+      "은퇴",
+      "slang"
+    ]
+  },
+  {
+    "id": "찍먹",
+    "term": "찍먹",
+    "fullName": "가볍게 체험해보다",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "직업/콘텐츠를 깊이 파지 않고",
+    "tags": [
+      "찍먹",
+      "가볍게 체험해보다",
+      "slang"
+    ]
+  },
+  {
+    "id": "환승충",
+    "term": "환승충",
+    "fullName": "여러 직업을 돌려 키우는 유저",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "여러 직업을 돌려 키우는 유저",
+    "tags": [
+      "환승충",
+      "여러 직업을 돌려 키우는 유저",
+      "slang"
+    ]
+  },
+  {
+    "id": "쌩뉴비",
+    "term": "쌩뉴비",
+    "fullName": "완전 초보자",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "완전 초보자",
+    "tags": [
+      "쌩뉴비",
+      "완전 초보자",
+      "뉴비",
+      "초보",
+      "slang"
+    ]
+  },
+  {
+    "id": "고인물",
+    "term": "고인물",
+    "fullName": "오래된 베테랑 유저",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "오래된 베테랑 유저",
+    "tags": [
+      "고인물",
+      "오래된 베테랑 유저",
+      "베테랑",
+      "slang"
+    ]
+  },
+  {
+    "id": "복귀",
+    "term": "복귀",
+    "fullName": "오랜만에 게임에 돌아온 유저",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "오랜만에 게임에 돌아온 유저",
+    "tags": [
+      "복귀",
+      "오랜만에 게임에 돌아온 유저",
+      "slang"
+    ]
+  },
+  {
+    "id": "솔플",
+    "term": "솔플",
+    "fullName": "솔로 플레이",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "솔로 플레이",
+    "tags": [
+      "솔플",
+      "솔로 플레이",
+      "솔로",
+      "slang"
+    ]
+  },
+  {
+    "id": "라바브웨",
+    "term": "라바브웨",
+    "fullName": "라그나로크 + 짐바브웨",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "제니 인플레이션 비꼬는 표현",
+    "tags": [
+      "라바브웨",
+      "라그나로크 + 짐바브웨",
+      "인플레이션",
+      "slang"
+    ]
+  },
+  {
+    "id": "봇",
+    "term": "봇",
+    "fullName": "매크로/자동 사냥 프로그램",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "작업장 문제",
+    "tags": [
+      "봇",
+      "매크로/자동 사냥 프로그램",
+      "매크로",
+      "slang"
+    ]
+  },
+  {
+    "id": "인간봇",
+    "term": "인간봇",
+    "fullName": "매크로는 아닌데 정줄놓고 무아지경으로 반복 사냥하는 유저",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "매크로는 아닌데 정줄놓고 무아지경으로 반복 사냥하는 유저",
+    "tags": [
+      "인간봇",
+      "매크로는 아닌데 정줄놓고 무아지경으로 반복 사냥하는 유저",
+      "slang"
+    ]
+  },
+  {
+    "id": "민폐",
+    "term": "민폐",
+    "fullName": "다른 유저에게 피해를 주는 행위",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "다른 유저에게 피해를 주는 행위",
+    "tags": [
+      "민폐",
+      "다른 유저에게 피해를 주는 행위",
+      "slang"
+    ]
+  },
+  {
+    "id": "갈통이가-아파오는",
+    "term": "갈통이가 아파오는",
+    "fullName": "스트레스 받는",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "'고캐 때문에 갈통이가 아파오는데'",
+    "tags": [
+      "갈통이가 아파오는",
+      "스트레스 받는",
+      "slang"
+    ]
+  },
+  {
+    "id": "문신",
+    "term": "문신",
+    "fullName": "거래 제한/가격 폭락 위험이 있는 고가 아이템",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "거래 제한/가격 폭락 위험이 있는 고가 아이템",
+    "tags": [
+      "문신",
+      "거래 제한/가격 폭락 위험이 있는 고가 아이템",
+      "slang"
+    ]
+  },
+  {
+    "id": "돌려쓰기",
+    "term": "돌려쓰기",
+    "fullName": "하나의 장비를 여러 캐릭터가 공유",
+    "category": "slang",
+    "subcategory": "게임 플레이",
+    "description": "하나의 장비를 여러 캐릭터가 공유",
+    "tags": [
+      "돌려쓰기",
+      "하나의 장비를 여러 캐릭터가 공유",
+      "slang"
+    ]
+  },
+  {
+    "id": "라갤러",
+    "term": "라갤러",
+    "fullName": "라그마갤 비회원 기본 닉네임",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "라그마갤 비회원 기본 닉네임",
+    "tags": [
+      "라갤러",
+      "라그마갤 비회원 기본 닉네임",
+      "디시인사이드",
+      "라그마갤",
+      "slang"
+    ]
+  },
+  {
+    "id": "라그-ro",
+    "term": "라그/RO",
+    "fullName": "라그나로크 온라인 약칭",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "라그나로크 온라인 약칭",
+    "tags": [
+      "라그/RO",
+      "라그나로크 온라인 약칭",
+      "라그나로크",
+      "RO",
+      "slang"
+    ]
+  },
+  {
+    "id": "개추",
+    "term": "개추",
+    "fullName": "추천 (좋아요)",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "추천 (좋아요)",
+    "tags": [
+      "개추",
+      "추천 (좋아요)",
+      "추천",
+      "slang"
+    ]
+  },
+  {
+    "id": "실베추",
+    "term": "실베추",
+    "fullName": "실수로 비추천",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "실수로 비추천",
+    "tags": [
+      "실베추",
+      "실수로 비추천",
+      "비추천",
+      "slang"
+    ]
+  },
+  {
+    "id": "배설",
+    "term": "배설",
+    "fullName": "글을 쓰다 (자조적 표현)",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "글을 쓰다 (자조적 표현)",
+    "tags": [
+      "배설",
+      "글을 쓰다 (자조적 표현)",
+      "slang"
+    ]
+  },
+  {
+    "id": "현타",
+    "term": "현타",
+    "fullName": "현실 자각 타임",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "후회되는 순간",
+    "tags": [
+      "현타",
+      "현실 자각 타임",
+      "slang"
+    ]
+  },
+  {
+    "id": "고트",
+    "term": "고트",
+    "fullName": "갓(God) + 세트",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "최고의 세트라는 찬사",
+    "tags": [
+      "고트",
+      "갓(God) + 세트",
+      "God",
+      "slang"
+    ]
+  },
+  {
+    "id": "개-씹",
+    "term": "개 씹",
+    "fullName": "강조 접두사 (비속어)",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "'개 씹 고트셋트' = 엄청난 갓세트",
+    "tags": [
+      "개 씹",
+      "강조 접두사 (비속어)",
+      "slang"
+    ]
+  },
+  {
+    "id": "충",
+    "term": "~충",
+    "fullName": "특정 행위를 반복하는 사람",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "'환승충'",
+    "tags": [
+      "~충",
+      "특정 행위를 반복하는 사람",
+      "slang"
+    ]
+  },
+  {
+    "id": "뉴비-게이",
+    "term": "뉴비 게이",
+    "fullName": "뉴비에 대한 디시 특유의 호칭",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "뉴비에 대한 디시 특유의 호칭",
+    "tags": [
+      "뉴비 게이",
+      "뉴비에 대한 디시 특유의 호칭",
+      "뉴비",
+      "slang"
+    ]
+  },
+  {
+    "id": "gg",
+    "term": "ㄱㄱ",
+    "fullName": "고고 (Go)",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "'설화갑 ㄱㄱ' = 설화 갑옷 가자",
+    "tags": [
+      "ㄱㄱ",
+      "고고 (Go)",
+      "Go",
+      "slang"
+    ]
+  },
+  {
+    "id": "molrum",
+    "term": "몰?룸",
+    "fullName": "모르겠음의 디시체",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "모르겠음의 디시체",
+    "tags": [
+      "몰?룸",
+      "모르겠음의 디시체",
+      "slang"
+    ]
+  },
+  {
+    "id": "eung",
+    "term": "ㅇㅇ",
+    "fullName": "응/맞아",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "응/맞아",
+    "tags": [
+      "ㅇㅇ",
+      "응/맞아",
+      "slang"
+    ]
+  },
+  {
+    "id": "jdam",
+    "term": "ㅈ댐",
+    "fullName": "망했다/큰일이다",
+    "category": "slang",
+    "subcategory": "커뮤니티/디시",
+    "description": "망했다/큰일이다",
+    "tags": [
+      "ㅈ댐",
+      "망했다/큰일이다",
+      "slang"
+    ]
+  },
+  {
+    "id": "저자본",
+    "term": "저자본",
+    "fullName": "5억 제니 미만",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "5억 제니 미만",
+    "tags": [
+      "저자본",
+      "5억 제니 미만",
+      "제니",
+      "투자",
+      "slang"
+    ]
+  },
+  {
+    "id": "중과금-1단계",
+    "term": "중과금 1단계",
+    "fullName": "~30억 제니",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "~30억 제니",
+    "tags": [
+      "중과금 1단계",
+      "~30억 제니",
+      "제니",
+      "투자",
+      "slang"
+    ]
+  },
+  {
+    "id": "중과금-2단계",
+    "term": "중과금 2단계",
+    "fullName": "30~50억 제니",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "30~50억 제니",
+    "tags": [
+      "중과금 2단계",
+      "30~50억 제니",
+      "제니",
+      "투자",
+      "slang"
+    ]
+  },
+  {
+    "id": "중과금-3단계",
+    "term": "중과금 3단계",
+    "fullName": "~100억 제니",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "~100억 제니",
+    "tags": [
+      "중과금 3단계",
+      "~100억 제니",
+      "제니",
+      "투자",
+      "slang"
+    ]
+  },
+  {
+    "id": "핵과금",
+    "term": "핵과금",
+    "fullName": "100억 제니 이상",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "풀 인첸·등급업·성좌 갑옷",
+    "tags": [
+      "핵과금",
+      "100억 제니 이상",
+      "제니",
+      "투자",
+      "slang"
+    ]
+  },
+  {
+    "id": "가성비",
+    "term": "가성비",
+    "fullName": "투자 대비 효율이 좋은 장비/세팅",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "투자 대비 효율이 좋은 장비/세팅",
+    "tags": [
+      "가성비",
+      "투자 대비 효율이 좋은 장비/세팅",
+      "효율",
+      "slang"
+    ]
+  },
+  {
+    "id": "엔드급",
+    "term": "엔드급",
+    "fullName": "최종 콘텐츠에 필요한 수준의 장비",
+    "category": "slang",
+    "subcategory": "스펙·투자",
+    "description": "최종 콘텐츠에 필요한 수준의 장비",
+    "tags": [
+      "엔드급",
+      "최종 콘텐츠에 필요한 수준의 장비",
+      "slang"
+    ]
+  },
+  {
+    "id": "plus-숫자---숫자강",
+    "term": "+숫자 / 숫자강",
+    "fullName": "제련 수치",
+    "category": "notation",
+    "subcategory": "",
+    "description": "+11, 11강",
+    "tags": [
+      "+숫자 / 숫자강",
+      "제련 수치",
+      "제련",
+      "notation"
+    ]
+  },
+  {
+    "id": "숫자plus-장비명",
+    "term": "숫자+장비명",
+    "fullName": "제련수치+장비",
+    "category": "notation",
+    "subcategory": "",
+    "description": "11글레, 9설화, 12A게오",
+    "tags": [
+      "숫자+장비명",
+      "제련수치+장비",
+      "제련",
+      "notation"
+    ]
+  },
+  {
+    "id": "숫자제",
+    "term": "숫자제",
+    "fullName": "레벨 제한",
+    "category": "notation",
+    "subcategory": "",
+    "description": "190제 = 레벨 190 이상 착용 가능",
+    "tags": [
+      "숫자제",
+      "레벨 제한",
+      "레벨",
+      "notation"
+    ]
+  },
+  {
+    "id": "숫자c-b-a-s",
+    "term": "숫자C/B/A/S",
+    "fullName": "등급",
+    "category": "notation",
+    "subcategory": "",
+    "description": "10C = +10 C등급, 12A = +12 A등급",
+    "tags": [
+      "숫자C/B/A/S",
+      "등급",
+      "notation"
+    ]
+  },
+  {
+    "id": "숫자억",
+    "term": "숫자억",
+    "fullName": "제니 단위",
+    "category": "notation",
+    "subcategory": "",
+    "description": "5억, 40억, 100억",
+    "tags": [
+      "숫자억",
+      "제니 단위",
+      "제니",
+      "notation"
+    ]
+  },
+  {
+    "id": "99인피",
+    "term": "99인피",
+    "fullName": "+9 인피니티 세트 2종",
+    "category": "notation",
+    "subcategory": "",
+    "description": "9인피 펜던트 + 9인피 이어링",
+    "tags": [
+      "99인피",
+      "+9 인피니티 세트 2종",
+      "인피니티",
+      "notation"
+    ]
+  },
+  {
+    "id": "1숍plus-11격수-notation",
+    "term": "1숍+11격수",
+    "fullName": "파티 구성",
+    "category": "notation",
+    "subcategory": "",
+    "description": "서포터 1 + 딜러 11",
+    "tags": [
+      "1숍+11격수",
+      "파티 구성",
+      "파티",
+      "notation"
+    ]
+  },
+  {
+    "id": "리뉴얼",
+    "term": "리뉴얼",
+    "fullName": "2010년경 대규모 시스템 개편",
+    "category": "history",
+    "subcategory": "",
+    "description": "스탯/레벨 체계 변경",
+    "tags": [
+      "리뉴얼",
+      "2010년경 대규모 시스템 개편",
+      "2010",
+      "개편",
+      "history"
+    ]
+  },
+  {
+    "id": "리뉴얼-전-후",
+    "term": "리뉴얼 전/후",
+    "fullName": "구시대 vs 현행 시스템 구분",
+    "category": "history",
+    "subcategory": "",
+    "description": "구시대 vs 현행 시스템 구분",
+    "tags": [
+      "리뉴얼 전/후",
+      "구시대 vs 현행 시스템 구분",
+      "history"
+    ]
+  },
+  {
+    "id": "그라비티",
+    "term": "그라비티",
+    "fullName": "라그나로크 온라인 개발/운영사",
+    "category": "history",
+    "subcategory": "",
+    "description": "라그나로크 온라인 개발/운영사",
+    "tags": [
+      "그라비티",
+      "라그나로크 온라인 개발/운영사",
+      "Gravity",
+      "개발사",
+      "history"
+    ]
+  },
+  {
+    "id": "네오싸이언",
+    "term": "네오싸이언",
+    "fullName": "그라비티 자회사",
+    "category": "history",
+    "subcategory": "",
+    "description": "모바일 사업 담당",
+    "tags": [
+      "네오싸이언",
+      "그라비티 자회사",
+      "그라비티",
+      "history"
+    ]
+  },
+  {
+    "id": "클베",
+    "term": "클베",
+    "fullName": "클로즈드 베타 테스트",
+    "category": "history",
+    "subcategory": "",
+    "description": "클로즈드 베타 테스트",
+    "tags": [
+      "클베",
+      "클로즈드 베타 테스트",
+      "CBT",
+      "베타",
+      "history"
+    ]
+  },
+  {
+    "id": "상용화",
+    "term": "상용화",
+    "fullName": "2002년 8월 정식 서비스 개시",
+    "category": "history",
+    "subcategory": "",
+    "description": "2002년 8월 정식 서비스 개시",
+    "tags": [
+      "상용화",
+      "2002년 8월 정식 서비스 개시",
+      "2002",
+      "history"
+    ]
+  },
+  {
+    "id": "부분-유료화",
+    "term": "부분 유료화",
+    "fullName": "2010년 무료 전환",
+    "category": "history",
+    "subcategory": "",
+    "description": "2010년 무료 전환",
+    "tags": [
+      "부분 유료화",
+      "2010년 무료 전환",
+      "2010",
+      "무료",
+      "history"
+    ]
+  },
+  {
+    "id": "바포메트-서버",
+    "term": "바포메트 서버",
+    "fullName": "2008년 개설 서버",
+    "category": "history",
+    "subcategory": "",
+    "description": "2008년 개설 서버",
+    "tags": [
+      "바포메트 서버",
+      "2008년 개설 서버",
+      "2008",
+      "서버",
+      "history"
+    ]
+  },
+  {
+    "id": "제니-판매-의혹",
+    "term": "제니 판매 의혹",
+    "fullName": "내부 직원 RMT(현금거래) 의혹 사건",
+    "category": "history",
+    "subcategory": "",
+    "description": "내부 직원 RMT(현금거래) 의혹 사건",
+    "tags": [
+      "제니 판매 의혹",
+      "내부 직원 RMT(현금거래) 의혹 사건",
+      "RMT",
+      "history"
+    ]
+  },
+  {
+    "id": "아이템-복사-버그",
+    "term": "아이템 복사 버그",
+    "fullName": "길드창고 복사 버그",
+    "category": "history",
+    "subcategory": "",
+    "description": "6조 제니 회수 사건 (2021)",
+    "tags": [
+      "아이템 복사 버그",
+      "길드창고 복사 버그",
+      "2021",
+      "버그",
+      "history"
+    ]
+  },
+  {
+    "id": "확률-조작",
+    "term": "확률 조작",
+    "fullName": "확률형 아이템 확률 고지 오류 사건",
+    "category": "history",
+    "subcategory": "",
+    "description": "확률형 아이템 확률 고지 오류 사건",
+    "tags": [
+      "확률 조작",
+      "확률형 아이템 확률 고지 오류 사건",
+      "history"
+    ]
+  }
+]

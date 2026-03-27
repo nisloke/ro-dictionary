@@ -1,0 +1,50 @@
+---
+import categories from '../data/categories.json';
+import terms from '../data/terms.json';
+
+const countByCategory = terms.reduce<Record<string, number>>((acc, t) => {
+  acc[t.category] = (acc[t.category] || 0) + 1;
+  return acc;
+}, {});
+
+const sorted = [...categories].sort((a, b) => a.order - b.order);
+---
+
+<nav aria-label="목차">
+  {/* Mobile: horizontal scroll */}
+  <div class="flex gap-2 overflow-x-auto pb-2 lg:hidden">
+    {sorted.map((cat) => (
+      <a
+        href={`#${cat.code}`}
+        class="flex-none rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+      >
+        {cat.name}
+        <span class="ml-1 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+          {countByCategory[cat.code] || 0}
+        </span>
+      </a>
+    ))}
+  </div>
+
+  {/* Desktop: sidebar list */}
+  <div class="hidden lg:block sticky top-6">
+    <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+      목차
+    </h2>
+    <ul class="space-y-1">
+      {sorted.map((cat) => (
+        <li>
+          <a
+            href={`#${cat.code}`}
+            class="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+          >
+            <span>{cat.name}</span>
+            <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+              {countByCategory[cat.code] || 0}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>

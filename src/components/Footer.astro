@@ -1,0 +1,15 @@
+---
+interface Props {
+  lastUpdated?: string;
+}
+
+const { lastUpdated } = Astro.props;
+const displayDate = lastUpdated || new Date().toISOString().slice(0, 10);
+---
+
+<footer class="mt-12 border-t border-gray-200 dark:border-gray-800 pt-6 pb-8">
+  <div class="text-center text-xs text-gray-400 dark:text-gray-500 space-y-1">
+    <p>디시인사이드 라그나로크온라인 마이너갤러리 등 커뮤니티에서 수집</p>
+    <p>마지막 업데이트: {displayDate}</p>
+  </div>
+</footer>

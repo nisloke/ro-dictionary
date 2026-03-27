@@ -1,0 +1,313 @@
+---
+import terms from '../data/terms.json';
+import categories from '../data/categories.json';
+---
+
+<div class="relative mb-6" id="search-wrapper">
+  <!-- Search Input -->
+  <div class="relative">
+    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+      <svg class="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+    </div>
+    <input
+      type="text"
+      id="search-input"
+      placeholder="용어 검색... (예: 드나, 글레, 방무)"
+      autocomplete="off"
+      class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition-colors"
+    />
+    <!-- Clear button -->
+    <button
+      id="search-clear"
+      type="button"
+      aria-label="검색 지우기"
+      class="absolute inset-y-0 right-0 hidden items-center pr-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <!-- Keyboard shortcut hint -->
+    <div id="search-hint" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <kbd class="rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-xs text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500">/</kbd>
+    </div>
+  </div>
+
+  <!-- Results Dropdown -->
+  <div
+    id="search-results"
+    class="absolute left-0 right-0 top-full z-50 mt-1 hidden max-h-80 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+  >
+    <!-- Results count -->
+    <div id="search-count" class="sticky top-0 border-b border-gray-100 bg-gray-50 px-3 py-1.5 text-xs text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400"></div>
+    <!-- Result items container -->
+    <div id="search-items"></div>
+    <!-- Empty state -->
+    <div id="search-empty" class="hidden px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+      검색 결과가 없습니다.
+    </div>
+  </div>
+</div>
+
+<!-- Embedded data for client-side access -->
+<template id="terms-data">{JSON.stringify(terms)}</template>
+<template id="categories-data">{JSON.stringify(categories)}</template>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  // Parse embedded data
+  const terms: Array<{
+    id: string;
+    term: string;
+    fullName: string;
+    category: string;
+    subcategory: string;
+    description: string;
+    tags: string[];
+  }> = JSON.parse(document.getElementById('terms-data')!.innerHTML);
+
+  const categories: Array<{
+    code: string;
+    name: string;
+    order: number;
+    description: string;
+  }> = JSON.parse(document.getElementById('categories-data')!.innerHTML);
+
+  // Build category lookup map
+  const categoryMap = new Map(categories.map((c) => [c.code, c.name]));
+
+  // Initialize Fuse.js
+  const fuse = new Fuse(terms, {
+    keys: [
+      { name: 'term', weight: 0.4 },
+      { name: 'fullName', weight: 0.3 },
+      { name: 'description', weight: 0.2 },
+      { name: 'tags', weight: 0.1 },
+    ],
+    threshold: 0.3,
+    includeMatches: true,
+    minMatchCharLength: 1,
+  });
+
+  // DOM references
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchResults = document.getElementById('search-results')!;
+  const searchItems = document.getElementById('search-items')!;
+  const searchCount = document.getElementById('search-count')!;
+  const searchEmpty = document.getElementById('search-empty')!;
+  const searchClear = document.getElementById('search-clear')!;
+  const searchHint = document.getElementById('search-hint')!;
+
+  let activeIndex = -1;
+  let currentResults: typeof terms = [];
+
+  // Debounce utility
+  function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
+    let timer: ReturnType<typeof setTimeout>;
+    return (...args: Parameters<T>) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), ms);
+    };
+  }
+
+  // Truncate description for display
+  function truncate(str: string, len: number): string {
+    if (str.length <= len) return str;
+    return str.slice(0, len) + '…';
+  }
+
+  // Render search results
+  function renderResults(query: string) {
+    if (!query.trim()) {
+      hideResults();
+      return;
+    }
+
+    const results = fuse.search(query, { limit: 30 });
+    currentResults = results.map((r) => r.item);
+
+    if (results.length === 0) {
+      searchItems.innerHTML = '';
+      searchCount.textContent = '';
+      searchEmpty.classList.remove('hidden');
+      searchResults.classList.remove('hidden');
+      return;
+    }
+
+    searchEmpty.classList.add('hidden');
+    searchCount.textContent = `${results.length}개 항목 검색됨`;
+
+    searchItems.innerHTML = results
+      .map((result, idx) => {
+        const item = result.item;
+        const catName = categoryMap.get(item.category) ?? item.category;
+        return `<button
+          class="search-result-item flex w-full items-start gap-3 px-3 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${idx === activeIndex ? 'bg-gray-50 dark:bg-gray-800' : ''}"
+          data-index="${idx}"
+          data-id="${item.id}"
+        >
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-sm text-gray-900 dark:text-gray-100">${escapeHtml(item.term)}</span>
+              <span class="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">${escapeHtml(catName)}</span>
+            </div>
+            <div class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(item.fullName)}</div>
+            <div class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">${escapeHtml(truncate(item.description, 60))}</div>
+          </div>
+        </button>`;
+      })
+      .join('');
+
+    searchResults.classList.remove('hidden');
+    activeIndex = -1;
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(str: string): string {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Hide results dropdown
+  function hideResults() {
+    searchResults.classList.add('hidden');
+    searchItems.innerHTML = '';
+    searchCount.textContent = '';
+    searchEmpty.classList.add('hidden');
+    activeIndex = -1;
+    currentResults = [];
+  }
+
+  // Clear search
+  function clearSearch() {
+    searchInput.value = '';
+    hideResults();
+    updateClearButton();
+  }
+
+  // Toggle clear button / hint visibility
+  function updateClearButton() {
+    const hasValue = searchInput.value.length > 0;
+    if (hasValue) {
+      searchClear.classList.remove('hidden');
+      searchClear.classList.add('flex');
+      searchHint.classList.add('hidden');
+    } else {
+      searchClear.classList.add('hidden');
+      searchClear.classList.remove('flex');
+      searchHint.classList.remove('hidden');
+    }
+  }
+
+  // Navigate to a term row in the table and highlight it
+  function navigateToTerm(id: string) {
+    hideResults();
+    searchInput.blur();
+
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Briefly highlight the row
+      target.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+      setTimeout(() => {
+        target.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+      }, 2000);
+    } else {
+      // Fallback: try hash navigation
+      window.location.hash = `#${id}`;
+    }
+  }
+
+  // Update active item highlight
+  function updateActiveItem() {
+    const items = searchItems.querySelectorAll('.search-result-item');
+    items.forEach((item, idx) => {
+      if (idx === activeIndex) {
+        item.classList.add('bg-gray-50', 'dark:bg-gray-800');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('bg-gray-50', 'dark:bg-gray-800');
+      }
+    });
+  }
+
+  // --- Event Listeners ---
+
+  // Search input with debounce
+  const debouncedSearch = debounce(() => {
+    renderResults(searchInput.value);
+  }, 150);
+
+  searchInput.addEventListener('input', () => {
+    updateClearButton();
+    debouncedSearch();
+  });
+
+  // Clear button
+  searchClear.addEventListener('click', clearSearch);
+
+  // Click on result item
+  searchItems.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.search-result-item') as HTMLElement | null;
+    if (btn) {
+      const id = btn.dataset.id;
+      if (id) navigateToTerm(id);
+    }
+  });
+
+  // Keyboard navigation
+  searchInput.addEventListener('keydown', (e) => {
+    const items = searchItems.querySelectorAll('.search-result-item');
+    const count = items.length;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (count > 0) {
+        activeIndex = (activeIndex + 1) % count;
+        updateActiveItem();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (count > 0) {
+        activeIndex = activeIndex <= 0 ? count - 1 : activeIndex - 1;
+        updateActiveItem();
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < currentResults.length) {
+        navigateToTerm(currentResults[activeIndex].id);
+      }
+    } else if (e.key === 'Escape') {
+      clearSearch();
+      searchInput.blur();
+    }
+  });
+
+  // Global "/" shortcut to focus search
+  document.addEventListener('keydown', (e) => {
+    if (
+      e.key === '/' &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey &&
+      document.activeElement !== searchInput &&
+      !(document.activeElement instanceof HTMLInputElement) &&
+      !(document.activeElement instanceof HTMLTextAreaElement)
+    ) {
+      e.preventDefault();
+      searchInput.focus();
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('search-wrapper');
+    if (wrapper && !wrapper.contains(e.target as Node)) {
+      hideResults();
+    }
+  });
+</script>
