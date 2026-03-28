@@ -1,0 +1,618 @@
+---
+import terms from '../data/terms.json';
+---
+
+<!-- Collapsible Panel -->
+<div class="mb-6">
+  <button
+    id="translator-toggle"
+    type="button"
+    class="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+  >
+    <span>💬 문장 풀이기</span>
+    <svg id="translator-chevron" class="h-4 w-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+    </svg>
+  </button>
+
+  <div id="translator-panel" class="hidden mt-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+    <!-- Supabase config (empty = skip API call) -->
+    <div id="translator-config" data-supabase-url="" data-supabase-anon-key=""></div>
+
+    <!-- Textarea -->
+    <div class="relative">
+      <textarea
+        id="translator-input"
+        placeholder="라그마갤 문장을 입력하세요..."
+        maxlength="500"
+        rows="3"
+        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition-colors resize-y"
+      ></textarea>
+      <div id="translator-charcount" class="absolute bottom-2 right-3 text-xs text-gray-400 dark:text-gray-500 pointer-events-none">
+        0 / 500
+      </div>
+    </div>
+
+    <!-- Over-limit warning -->
+    <div id="translator-warning" class="hidden mt-1 text-xs text-red-500 dark:text-red-400">
+      500자를 초과하여 잘렸습니다.
+    </div>
+
+    <!-- Action button -->
+    <div class="mt-2 flex justify-end">
+      <button
+        id="translator-submit"
+        type="button"
+        disabled
+        class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        풀이
+      </button>
+    </div>
+
+    <!-- Result Area -->
+    <div id="translator-result" class="hidden mt-4">
+      <!-- Interactive text with annotated terms -->
+      <div id="translator-output" class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-sm leading-relaxed text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+      </div>
+
+      <!-- Summary -->
+      <div class="mt-3 space-y-3">
+        <!-- Dictionary matches -->
+        <div id="translator-dict-summary">
+          <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">📖 사전 매칭: <span id="translator-dict-count">0</span>개</h4>
+          <ul id="translator-dict-list" class="text-xs text-gray-600 dark:text-gray-400 space-y-0.5 pl-4 list-disc"></ul>
+        </div>
+
+        <!-- Estimated terms -->
+        <div id="translator-est-summary">
+          <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-2">
+            <span>⚠️ 사전 미등재 (Sonnet 추정): <span id="translator-est-count">0</span>개</span>
+            <span id="translator-spinner" class="hidden">
+              <svg class="animate-spin h-3.5 w-3.5 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            <span id="translator-spinner-text" class="hidden text-xs text-orange-500 font-normal">Sonnet 추정 중...</span>
+          </h4>
+          <ul id="translator-est-list" class="text-xs text-gray-600 dark:text-gray-400 space-y-0.5 pl-4 list-disc"></ul>
+          <p id="translator-est-error" class="hidden text-xs text-red-500 dark:text-red-400 mt-1"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Embedded data for client-side access -->
+<template id="terms-for-translator">{JSON.stringify(terms)}</template>
+
+<!-- Tooltip styles -->
+<style is:global>
+  .term-dict,
+  .term-estimated {
+    position: relative;
+  }
+
+  .term-dict {
+    color: rgb(37 99 235); /* text-blue-600 */
+    text-decoration: underline;
+    text-decoration-color: rgb(96 165 250); /* decoration-blue-400 */
+    cursor: pointer;
+  }
+  .term-dict:hover {
+    color: rgb(29 78 216); /* hover:text-blue-700 */
+  }
+
+  .term-estimated {
+    color: rgb(234 88 12); /* text-orange-600 */
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-decoration-color: rgb(251 146 60); /* decoration-orange-400 */
+    cursor: help;
+  }
+
+  :is(.dark .term-dict) {
+    color: rgb(96 165 250); /* dark:text-blue-400 */
+    text-decoration-color: rgb(59 130 246); /* dark:decoration-blue-500 */
+  }
+  :is(.dark .term-dict:hover) {
+    color: rgb(147 197 253); /* dark:hover:text-blue-300 */
+  }
+
+  :is(.dark .term-estimated) {
+    color: rgb(251 146 60); /* dark:text-orange-400 */
+    text-decoration-color: rgb(249 115 22); /* dark:decoration-orange-500 */
+  }
+
+  /* Tooltip via ::after */
+  .term-dict[data-tooltip]:hover::after,
+  .term-estimated[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    z-index: 50;
+    pointer-events: none;
+    background-color: rgb(17 24 39); /* gray-900 */
+    color: rgb(243 244 246); /* gray-100 */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+
+  :is(.dark .term-dict[data-tooltip]:hover::after),
+  :is(.dark .term-estimated[data-tooltip]:hover::after) {
+    background-color: rgb(31 41 55); /* gray-800 */
+    color: rgb(229 231 235); /* gray-200 */
+  }
+
+  /* Tooltip arrow */
+  .term-dict[data-tooltip]:hover::before,
+  .term-estimated[data-tooltip]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgb(17 24 39);
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  :is(.dark .term-dict[data-tooltip]:hover::before),
+  :is(.dark .term-estimated[data-tooltip]:hover::before) {
+    border-top-color: rgb(31 41 55);
+  }
+</style>
+
+<script>
+  // --- Types ---
+  interface TermEntry {
+    id: string;
+    term: string;
+    fullName: string;
+    category: string;
+    subcategory: string;
+    description: string;
+    tags: string[];
+  }
+
+  interface MatchedSegment {
+    type: 'matched';
+    text: string;
+    termData: TermEntry;
+  }
+
+  interface PlainSegment {
+    type: 'plain';
+    text: string;
+  }
+
+  interface EstimatedSegment {
+    type: 'estimated';
+    text: string;
+    fullName: string;
+    description: string;
+  }
+
+  type Segment = MatchedSegment | PlainSegment | EstimatedSegment;
+
+  // --- Parse embedded data ---
+  const allTerms: TermEntry[] = JSON.parse(
+    document.getElementById('terms-for-translator')!.innerHTML
+  );
+
+  // --- Build lookup map: key (lowercase) -> TermEntry ---
+  const termLookup = new Map<string, TermEntry>();
+  for (const entry of allTerms) {
+    // Add the term itself
+    const termKey = entry.term.toLowerCase();
+    if (!termLookup.has(termKey) || entry.term.length >= (termLookup.get(termKey)!.term.length)) {
+      termLookup.set(termKey, entry);
+    }
+    // Add each tag as an alias
+    for (const tag of entry.tags) {
+      const tagKey = tag.toLowerCase();
+      // Skip overly generic tags (category codes)
+      if (['job', 'gear', 'system', 'stat', 'place', 'slang', 'notation', 'history'].includes(tagKey)) continue;
+      if (!termLookup.has(tagKey)) {
+        termLookup.set(tagKey, entry);
+      }
+    }
+  }
+
+  // Sort keys by length descending for longest-match-first
+  const sortedKeys = Array.from(termLookup.keys()).sort((a, b) => b.length - a.length);
+
+  // --- Korean particles to exclude from estimated terms ---
+  const PARTICLES = new Set([
+    '은', '는', '이', '가', '을', '를', '의', '에', '에서', '로', '으로',
+    '과', '와', '도', '만', '까지', '부터', '에게', '한테', '께', '서',
+    '든', '라', '며', '고', '면', '지', '요', '네', '데', '다', '야', '죠',
+    'ㅋ', 'ㅎ', 'ㅠ', 'ㅜ', 'ㄱ', 'ㄴ', 'ㄷ',
+  ]);
+
+  // --- Escape HTML ---
+  function escapeHtml(str: string): string {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Truncate ---
+  function truncate(str: string, len: number): string {
+    if (str.length <= len) return str;
+    return str.slice(0, len) + '\u2026';
+  }
+
+  // --- Dictionary matching engine (longest-match-first) ---
+  function matchTerms(input: string): (MatchedSegment | PlainSegment)[] {
+    const segments: (MatchedSegment | PlainSegment)[] = [];
+    const inputLower = input.toLowerCase();
+    let i = 0;
+    let plainBuf = '';
+
+    while (i < input.length) {
+      let found = false;
+      for (const key of sortedKeys) {
+        if (i + key.length > input.length) continue;
+        const slice = inputLower.slice(i, i + key.length);
+        if (slice === key) {
+          // Flush plain buffer
+          if (plainBuf) {
+            segments.push({ type: 'plain', text: plainBuf });
+            plainBuf = '';
+          }
+          segments.push({
+            type: 'matched',
+            text: input.slice(i, i + key.length),
+            termData: termLookup.get(key)!,
+          });
+          i += key.length;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        plainBuf += input[i];
+        i++;
+      }
+    }
+    if (plainBuf) {
+      segments.push({ type: 'plain', text: plainBuf });
+    }
+    return segments;
+  }
+
+  // --- Check if a string looks like a potential term ---
+  function isPotentialTerm(text: string): boolean {
+    const trimmed = text.trim();
+    if (trimmed.length < 2) return false;
+    if (/\s/.test(trimmed)) return false;
+    // Pure punctuation or numbers
+    if (/^[\d\s\p{P}\p{S}]+$/u.test(trimmed)) return false;
+    // Known particles
+    if (PARTICLES.has(trimmed)) return false;
+    return true;
+  }
+
+  // --- Navigate to term in the table (reuses Search.astro pattern) ---
+  function navigateToTerm(id: string) {
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+      setTimeout(() => {
+        target.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+      }, 2000);
+    } else {
+      window.location.hash = `#${id}`;
+    }
+  }
+
+  // --- DOM references ---
+  const toggleBtn = document.getElementById('translator-toggle')!;
+  const panel = document.getElementById('translator-panel')!;
+  const chevron = document.getElementById('translator-chevron')!;
+  const textarea = document.getElementById('translator-input') as HTMLTextAreaElement;
+  const charCount = document.getElementById('translator-charcount')!;
+  const warning = document.getElementById('translator-warning')!;
+  const submitBtn = document.getElementById('translator-submit') as HTMLButtonElement;
+  const resultArea = document.getElementById('translator-result')!;
+  const outputEl = document.getElementById('translator-output')!;
+  const dictCount = document.getElementById('translator-dict-count')!;
+  const dictList = document.getElementById('translator-dict-list')!;
+  const estCount = document.getElementById('translator-est-count')!;
+  const estList = document.getElementById('translator-est-list')!;
+  const estError = document.getElementById('translator-est-error')!;
+  const spinner = document.getElementById('translator-spinner')!;
+  const spinnerText = document.getElementById('translator-spinner-text')!;
+  const configEl = document.getElementById('translator-config')!;
+
+  let isLoading = false;
+
+  // --- Toggle panel ---
+  toggleBtn.addEventListener('click', () => {
+    const isHidden = panel.classList.contains('hidden');
+    if (isHidden) {
+      panel.classList.remove('hidden');
+      chevron.classList.add('rotate-180');
+    } else {
+      panel.classList.add('hidden');
+      chevron.classList.remove('rotate-180');
+    }
+  });
+
+  // --- Char count & button state ---
+  textarea.addEventListener('input', () => {
+    let val = textarea.value;
+    if (val.length > 500) {
+      textarea.value = val.slice(0, 500);
+      val = textarea.value;
+      warning.classList.remove('hidden');
+    } else {
+      warning.classList.add('hidden');
+    }
+    charCount.textContent = `${val.length} / 500`;
+    submitBtn.disabled = val.trim().length === 0 || isLoading;
+  });
+
+  // --- Keyboard: Enter to submit, Shift+Enter for newline ---
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!submitBtn.disabled) {
+        runTranslation();
+      }
+    }
+  });
+
+  // --- Submit button click ---
+  submitBtn.addEventListener('click', () => {
+    if (!submitBtn.disabled) {
+      runTranslation();
+    }
+  });
+
+  // --- Click delegation for term links in output ---
+  outputEl.addEventListener('click', (e) => {
+    const link = (e.target as HTMLElement).closest('.term-dict') as HTMLElement | null;
+    if (link) {
+      e.preventDefault();
+      const termId = link.dataset.termId;
+      if (termId) navigateToTerm(termId);
+    }
+  });
+
+  // --- Set loading state ---
+  function setLoading(loading: boolean) {
+    isLoading = loading;
+    submitBtn.disabled = loading || textarea.value.trim().length === 0;
+    submitBtn.textContent = loading ? '풀이 중...' : '풀이';
+    if (loading) {
+      spinner.classList.remove('hidden');
+      spinnerText.classList.remove('hidden');
+    } else {
+      spinner.classList.add('hidden');
+      spinnerText.classList.add('hidden');
+    }
+  }
+
+  // --- Build result HTML from segments ---
+  function renderSegments(segments: Segment[]): string {
+    return segments.map((seg) => {
+      if (seg.type === 'matched') {
+        const tooltip = [seg.termData.term, seg.termData.fullName, seg.termData.description]
+          .filter(Boolean)
+          .join(' \u00B7 ');
+        return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}">${escapeHtml(seg.text)}</a>`;
+      } else if (seg.type === 'estimated') {
+        const tooltip = `\u26A0\uFE0F \uC0AC\uC804 \uBBF8\uB4F1\uC7AC \u00B7 ${escapeHtml(seg.fullName)} \u00B7 ${escapeHtml(seg.description)}`;
+        return `<span class="term-estimated" data-tooltip="${tooltip}">${escapeHtml(seg.text)}</span>`;
+      } else {
+        return escapeHtml(seg.text);
+      }
+    }).join('');
+  }
+
+  // --- Build summary lists ---
+  function renderSummary(
+    dictMatches: MatchedSegment[],
+    estimated: EstimatedSegment[]
+  ) {
+    // Deduplicate dict matches by term id
+    const seenDict = new Map<string, MatchedSegment>();
+    for (const m of dictMatches) {
+      if (!seenDict.has(m.termData.id)) {
+        seenDict.set(m.termData.id, m);
+      }
+    }
+    const uniqueDict = Array.from(seenDict.values());
+
+    dictCount.textContent = String(uniqueDict.length);
+    dictList.innerHTML = uniqueDict.map((m) => {
+      const desc = m.termData.description ? ` (${truncate(m.termData.description, 30)})` : '';
+      return `<li>${escapeHtml(m.termData.term)} \u2192 ${escapeHtml(m.termData.fullName)}${escapeHtml(desc)}</li>`;
+    }).join('');
+
+    // Deduplicate estimated by text
+    const seenEst = new Map<string, EstimatedSegment>();
+    for (const e of estimated) {
+      if (!seenEst.has(e.text)) {
+        seenEst.set(e.text, e);
+      }
+    }
+    const uniqueEst = Array.from(seenEst.values());
+
+    estCount.textContent = String(uniqueEst.length);
+    estList.innerHTML = uniqueEst.map((e) => {
+      const desc = e.description ? ` (${truncate(e.description, 30)})` : '';
+      return `<li>${escapeHtml(e.text)} \u2192 ${escapeHtml(e.fullName)}${escapeHtml(desc)}</li>`;
+    }).join('');
+  }
+
+  // --- Main translation flow ---
+  async function runTranslation() {
+    const input = textarea.value.trim();
+    if (!input) return;
+
+    // Step 1: Dictionary matching
+    const segments = matchTerms(input);
+    const dictMatches = segments.filter((s): s is MatchedSegment => s.type === 'matched');
+    const plainSegments = segments.filter((s): s is PlainSegment => s.type === 'plain');
+
+    // Show initial results (dict only)
+    resultArea.classList.remove('hidden');
+    outputEl.innerHTML = renderSegments(segments);
+    estError.classList.add('hidden');
+    estList.innerHTML = '';
+    estCount.textContent = '0';
+    renderSummary(dictMatches, []);
+
+    // Step 2: Collect unmatched potential terms
+    const potentialTerms: string[] = [];
+    for (const seg of plainSegments) {
+      // Split plain text by spaces and punctuation to find potential terms
+      const chunks = seg.text.split(/[\s,.\-!?;:()[\]{}"'`~@#$%^&*+=|\\/<>]+/);
+      for (const chunk of chunks) {
+        if (isPotentialTerm(chunk)) {
+          potentialTerms.push(chunk);
+        }
+      }
+    }
+
+    // Deduplicate
+    const uniquePotentialTerms = [...new Set(potentialTerms)];
+
+    if (uniquePotentialTerms.length === 0) {
+      // No potential terms to estimate
+      return;
+    }
+
+    // Step 3: Call Supabase Edge Function (if configured)
+    const supabaseUrl = configEl.dataset.supabaseUrl;
+    const supabaseAnonKey = configEl.dataset.supabaseAnonKey;
+
+    if (!supabaseUrl) {
+      // No API configured, skip
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${supabaseUrl}/functions/v1/translate-sentence`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey || '',
+          'Authorization': `Bearer ${supabaseAnonKey || ''}`,
+        },
+        body: JSON.stringify({
+          unknownTerms: uniquePotentialTerms,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json() as {
+        results: Array<{ term: string; isRoTerm: boolean; fullName?: string; description?: string }>;
+      };
+
+      // Build estimated segments map (only RO terms)
+      const estimatedMap = new Map<string, { fullName: string; description: string }>();
+      if (data.results) {
+        for (const r of data.results) {
+          if (r.isRoTerm) {
+            estimatedMap.set(r.term.toLowerCase(), {
+              fullName: r.fullName ?? r.term,
+              description: r.description ?? '',
+            });
+          }
+        }
+      }
+
+      // Rebuild segments with estimated terms
+      const finalSegments: Segment[] = [];
+      const estimatedSegments: EstimatedSegment[] = [];
+
+      for (const seg of segments) {
+        if (seg.type === 'plain') {
+          // Re-scan plain text for estimated terms
+          const rebuilt = injectEstimates(seg.text, estimatedMap, estimatedSegments);
+          finalSegments.push(...rebuilt);
+        } else {
+          finalSegments.push(seg);
+        }
+      }
+
+      outputEl.innerHTML = renderSegments(finalSegments);
+      renderSummary(dictMatches, estimatedSegments);
+    } catch {
+      estError.textContent = '서버 연결 실패. 사전 매칭 결과만 표시합니다.';
+      estError.classList.remove('hidden');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // --- Inject estimated terms into plain text ---
+  function injectEstimates(
+    text: string,
+    estimatedMap: Map<string, { fullName: string; description: string }>,
+    collector: EstimatedSegment[]
+  ): Segment[] {
+    if (estimatedMap.size === 0) return [{ type: 'plain', text }];
+
+    // Build sorted keys for estimated terms (longest first)
+    const estKeys = Array.from(estimatedMap.keys()).sort((a, b) => b.length - a.length);
+    const segments: Segment[] = [];
+    const textLower = text.toLowerCase();
+    let i = 0;
+    let plainBuf = '';
+
+    while (i < text.length) {
+      let found = false;
+      for (const key of estKeys) {
+        if (i + key.length > text.length) continue;
+        if (textLower.slice(i, i + key.length) === key) {
+          if (plainBuf) {
+            segments.push({ type: 'plain', text: plainBuf });
+            plainBuf = '';
+          }
+          const info = estimatedMap.get(key)!;
+          const estSeg: EstimatedSegment = {
+            type: 'estimated',
+            text: text.slice(i, i + key.length),
+            fullName: info.fullName,
+            description: info.description,
+          };
+          segments.push(estSeg);
+          collector.push(estSeg);
+          i += key.length;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        plainBuf += text[i];
+        i++;
+      }
+    }
+    if (plainBuf) {
+      segments.push({ type: 'plain', text: plainBuf });
+    }
+    return segments;
+  }
+</script>
