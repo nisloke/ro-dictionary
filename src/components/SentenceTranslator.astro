@@ -1,5 +1,5 @@
 ---
-import terms from '../data/terms.json';
+// Data now fetched at runtime from Supabase via dataStore.ts
 ---
 
 <!-- Collapsible Panel -->
@@ -16,8 +16,7 @@ import terms from '../data/terms.json';
   </button>
 
   <div id="translator-panel" class="hidden mt-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
-    <!-- Supabase config (empty = skip API call) -->
-    <div id="translator-config" data-supabase-url="https://nyftkqzrbanrxcoaxzke.supabase.co" data-supabase-anon-key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZnRrcXpyYmFucnhjb2F4emtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzEyNzUsImV4cCI6MjA5MDI0NzI3NX0.j7tmgGPOB7L6Zm3SnegJsE69xD-szUvpDMTFOUouCEY"></div>
+    <!-- Supabase config now managed in src/lib/dataStore.ts -->
 
     <!-- Textarea -->
     <div class="relative">
@@ -83,9 +82,6 @@ import terms from '../data/terms.json';
     </div>
   </div>
 </div>
-
-<!-- Embedded data for client-side access -->
-<template id="terms-for-translator">{JSON.stringify(terms)}</template>
 
 <!-- Tooltip styles -->
 <style is:global>
@@ -175,17 +171,9 @@ import terms from '../data/terms.json';
 </style>
 
 <script>
-  // --- Types ---
-  interface TermEntry {
-    id: string;
-    term: string;
-    fullName: string;
-    category: string;
-    subcategory: string;
-    description: string;
-    tags: string[];
-  }
+  import { fetchTerms, type TermEntry } from '../lib/dataStore';
 
+  // --- Types ---
   interface MatchedSegment {
     type: 'matched';
     text: string;
@@ -206,26 +194,36 @@ import terms from '../data/terms.json';
 
   type Segment = MatchedSegment | PlainSegment | EstimatedSegment;
 
-  // --- Parse embedded data ---
-  const allTerms: TermEntry[] = JSON.parse(
-    document.getElementById('terms-for-translator')!.innerHTML
-  );
+  // --- Fetch data from Supabase at runtime ---
+  const allTerms = await fetchTerms();
 
   // --- Build lookup map: key (lowercase) -> TermEntry ---
+  // Priority: term field > Korean name derived from fullName > tags (restricted)
   const termLookup = new Map<string, TermEntry>();
+  const termFieldKeys = new Set<string>();
+
+  // Pass 1: term fields (highest priority, always win)
   for (const entry of allTerms) {
-    // Add the term itself
     const termKey = entry.term.toLowerCase();
-    if (!termLookup.has(termKey) || entry.term.length >= (termLookup.get(termKey)!.term.length)) {
-      termLookup.set(termKey, entry);
-    }
-    // Add each tag as an alias
-    for (const tag of entry.tags) {
-      const tagKey = tag.toLowerCase();
-      // Skip overly generic tags (category codes)
-      if (['job', 'gear', 'system', 'stat', 'place', 'slang', 'notation', 'history'].includes(tagKey)) continue;
-      if (!termLookup.has(tagKey)) {
-        termLookup.set(tagKey, entry);
+    termLookup.set(termKey, entry);
+    termFieldKeys.add(termKey);
+  }
+
+  // Pass 2: derive Korean name variants from fullName
+  // e.g. "룬 나이트 (Rune Knight)" → "룬 나이트", "룬나이트"
+  for (const entry of allTerms) {
+    if (!entry.fullName) continue;
+    // Strip parenthetical English part
+    const koreanPart = entry.fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
+    if (koreanPart && koreanPart !== entry.term) {
+      const key = koreanPart.toLowerCase();
+      if (!termFieldKeys.has(key) && !termLookup.has(key)) {
+        termLookup.set(key, entry);
+      }
+      // Also add space-stripped version: "룬 나이트" → "룬나이트"
+      const noSpace = koreanPart.replace(/\s+/g, '').toLowerCase();
+      if (noSpace !== key && !termFieldKeys.has(noSpace) && !termLookup.has(noSpace)) {
+        termLookup.set(noSpace, entry);
       }
     }
   }
@@ -336,7 +334,10 @@ import terms from '../data/terms.json';
   const estError = document.getElementById('translator-est-error')!;
   const spinner = document.getElementById('translator-spinner')!;
   const spinnerText = document.getElementById('translator-spinner-text')!;
-  const configEl = document.getElementById('translator-config')!;
+
+  // Supabase config (from dataStore)
+  const SUPABASE_URL = 'https://nyftkqzrbanrxcoaxzke.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZnRrcXpyYmFucnhjb2F4emtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzEyNzUsImV4cCI6MjA5MDI0NzI3NX0.j7tmgGPOB7L6Zm3SnegJsE69xD-szUvpDMTFOUouCEY';
 
   let isLoading = false;
 
@@ -411,13 +412,15 @@ import terms from '../data/terms.json';
   function renderSegments(segments: Segment[]): string {
     return segments.map((seg) => {
       if (seg.type === 'matched') {
-        const tooltip = [seg.termData.term, seg.termData.fullName, seg.termData.description]
+        const tooltip = [seg.termData.term, seg.termData.description]
           .filter(Boolean)
-          .join(' \u00B7 ');
-        return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}">${escapeHtml(seg.text)}</a>`;
+          .join(' · ');
+        const displayName = seg.termData.fullName || seg.text;
+        return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}">${escapeHtml(displayName)}</a>`;
       } else if (seg.type === 'estimated') {
-        const tooltip = `\u26A0\uFE0F \uC0AC\uC804 \uBBF8\uB4F1\uC7AC \u00B7 ${escapeHtml(seg.fullName)} \u00B7 ${escapeHtml(seg.description)}`;
-        return `<span class="term-estimated" data-tooltip="${tooltip}">${escapeHtml(seg.text)}</span>`;
+        const tooltip = `⚠️ 사전 미등재 · ${escapeHtml(seg.description)}`;
+        const displayName = seg.fullName || seg.text;
+        return `<span class="term-estimated" data-tooltip="${tooltip}">${escapeHtml(displayName)}</span>`;
       } else {
         return escapeHtml(seg.text);
       }
@@ -498,24 +501,16 @@ import terms from '../data/terms.json';
       return;
     }
 
-    // Step 3: Call Supabase Edge Function (if configured)
-    const supabaseUrl = configEl.dataset.supabaseUrl;
-    const supabaseAnonKey = configEl.dataset.supabaseAnonKey;
-
-    if (!supabaseUrl) {
-      // No API configured, skip
-      return;
-    }
-
+    // Step 3: Call Supabase Edge Function for unknown terms
     setLoading(true);
 
     try {
-      const response = await fetch(`${supabaseUrl}/functions/v1/translate-sentence`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/translate-sentence`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': supabaseAnonKey || '',
-          'Authorization': `Bearer ${supabaseAnonKey || ''}`,
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           unknownTerms: uniquePotentialTerms,

@@ -1,6 +1,5 @@
 ---
-import terms from '../data/terms.json';
-import categories from '../data/categories.json';
+// Data now fetched at runtime from Supabase via dataStore.ts
 ---
 
 <div class="relative mb-6" id="search-wrapper">
@@ -51,30 +50,12 @@ import categories from '../data/categories.json';
   </div>
 </div>
 
-<!-- Embedded data for client-side access -->
-<template id="terms-data">{JSON.stringify(terms)}</template>
-<template id="categories-data">{JSON.stringify(categories)}</template>
-
 <script>
   import Fuse from 'fuse.js';
+  import { fetchTerms, fetchCategories, type TermEntry } from '../lib/dataStore';
 
-  // Parse embedded data
-  const terms: Array<{
-    id: string;
-    term: string;
-    fullName: string;
-    category: string;
-    subcategory: string;
-    description: string;
-    tags: string[];
-  }> = JSON.parse(document.getElementById('terms-data')!.innerHTML);
-
-  const categories: Array<{
-    code: string;
-    name: string;
-    order: number;
-    description: string;
-  }> = JSON.parse(document.getElementById('categories-data')!.innerHTML);
+  // Fetch data from Supabase at runtime
+  const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
   // Build category lookup map
   const categoryMap = new Map(categories.map((c) => [c.code, c.name]));
@@ -102,7 +83,7 @@ import categories from '../data/categories.json';
   const searchHint = document.getElementById('search-hint')!;
 
   let activeIndex = -1;
-  let currentResults: typeof terms = [];
+  let currentResults: TermEntry[] = [];
 
   // Debounce utility
   function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number) {
