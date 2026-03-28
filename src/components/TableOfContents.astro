@@ -11,19 +11,33 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
 ---
 
 <nav aria-label="목차">
-  {/* Mobile: horizontal scroll */}
-  <div class="flex gap-2 overflow-x-auto pb-2 lg:hidden">
-    {sorted.map((cat) => (
-      <a
-        href={`#${cat.code}`}
-        class="flex-none rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-      >
-        {cat.name}
-        <span class="ml-1 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-          {countByCategory[cat.code] || 0}
-        </span>
-      </a>
-    ))}
+  {/* Mobile: collapsible TOC */}
+  <div class="lg:hidden mb-4">
+    <button
+      id="toc-toggle"
+      type="button"
+      class="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+    >
+      <span>목차 ({sorted.length}개 카테고리)</span>
+      <svg id="toc-chevron" class="h-4 w-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+      </svg>
+    </button>
+    <div id="toc-mobile-list" class="hidden mt-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div class="flex flex-wrap gap-2">
+        {sorted.map((cat) => (
+          <a
+            href={`#${cat.code}`}
+            class="toc-mobile-link flex-none rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+          >
+            {cat.name}
+            <span class="ml-1 inline-flex items-center justify-center rounded-full bg-gray-200 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+              {countByCategory[cat.code] || 0}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
   </div>
 
   {/* Desktop: sidebar list */}
@@ -48,3 +62,31 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
     </ul>
   </div>
 </nav>
+
+<script is:inline>
+  (function () {
+    var toggle = document.getElementById('toc-toggle');
+    var list = document.getElementById('toc-mobile-list');
+    var chevron = document.getElementById('toc-chevron');
+    if (!toggle || !list || !chevron) return;
+
+    toggle.addEventListener('click', function () {
+      var isHidden = list.classList.contains('hidden');
+      if (isHidden) {
+        list.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+      } else {
+        list.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+    });
+
+    // Close TOC when a link is clicked
+    list.addEventListener('click', function (e) {
+      if (e.target.closest('.toc-mobile-link')) {
+        list.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+    });
+  })();
+</script>

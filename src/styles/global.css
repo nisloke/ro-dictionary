@@ -5,3 +5,36 @@
 }
 
 @variant dark (&:where(.dark, .dark *));
+
+/* Thin scrollbar for horizontal table scroll */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: theme(--color-gray-300) transparent;
+}
+.dark .scrollbar-thin {
+  scrollbar-color: theme(--color-gray-700) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: theme(--color-gray-300);
+  border-radius: 3px;
+}
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: theme(--color-gray-700);
+}
+
+/* Smooth highlight transition for search results */
+tr {
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Better dark mode selection color */
+.dark ::selection {
+  background-color: theme(--color-blue-800);
+  color: theme(--color-blue-100);
+}

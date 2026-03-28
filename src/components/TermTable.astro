@@ -41,60 +41,64 @@ const hasSubcategories = groups.some((g) => g.sub !== '');
             {group.sub}
           </h3>
         )}
-        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-          <table class="min-w-full text-sm">
-            <thead>
-              <tr class="bg-gray-50 dark:bg-gray-800">
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">용어</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">풀네임</th>
-                <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">설명</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-              {group.items.map((t, i) => (
-                <tr
-                  id={t.id}
-                  class:list={[
-                    'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
-                    i % 2 === 1 && 'bg-gray-50/50 dark:bg-gray-900/30',
-                  ]}
-                >
-                  <td class="px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100">{t.term}</td>
-                  <td class="px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap">{t.fullName}</td>
-                  <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{t.description}</td>
+        <div class="relative">
+          <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-thin">
+            <table class="min-w-[540px] w-full text-sm border-collapse rounded-lg border border-gray-200 dark:border-gray-700">
+              <thead>
+                <tr class="bg-gray-50 dark:bg-gray-800">
+                  <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[100px]">용어</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[140px]">풀네임</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">설명</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                {group.items.map((t, i) => (
+                  <tr
+                    id={t.id}
+                    class:list={[
+                      'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
+                      i % 2 === 1 && 'bg-gray-50/50 dark:bg-gray-900/30',
+                    ]}
+                  >
+                    <td class="px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100">{t.term}</td>
+                    <td class="px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap">{t.fullName}</td>
+                    <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{t.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     ))
   ) : (
-    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-      <table class="min-w-full text-sm">
-        <thead>
-          <tr class="bg-gray-50 dark:bg-gray-800">
-            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">용어</th>
-            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">풀네임</th>
-            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">설명</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-          {terms.map((t, i) => (
-            <tr
-              id={t.id}
-              class:list={[
-                'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
-                i % 2 === 1 && 'bg-gray-50/50 dark:bg-gray-900/30',
-              ]}
-            >
-              <td class="px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100">{t.term}</td>
-              <td class="px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap">{t.fullName}</td>
-              <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{t.description}</td>
+    <div class="relative">
+      <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-thin">
+        <table class="min-w-[540px] w-full text-sm border-collapse rounded-lg border border-gray-200 dark:border-gray-700">
+          <thead>
+            <tr class="bg-gray-50 dark:bg-gray-800">
+              <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[100px]">용어</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[140px]">풀네임</th>
+              <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">설명</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            {terms.map((t, i) => (
+              <tr
+                id={t.id}
+                class:list={[
+                  'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
+                  i % 2 === 1 && 'bg-gray-50/50 dark:bg-gray-900/30',
+                ]}
+              >
+                <td class="px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100">{t.term}</td>
+                <td class="px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap">{t.fullName}</td>
+                <td class="px-3 py-2 text-gray-600 dark:text-gray-400">{t.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )}
 </section>
