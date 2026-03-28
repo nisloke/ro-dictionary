@@ -10,6 +10,12 @@ import { fetchTerms, fetchCategories } from '../lib/dataStore';
 
 const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
+if (import.meta.env.PROD && (terms.length === 0 || categories.length === 0)) {
+  throw new Error(
+    `[BUILD GUARD] Supabase returned ${terms.length} terms, ${categories.length} categories. Aborting build to prevent deploying an empty site.`
+  );
+}
+
 const totalCount = terms.length;
 const sorted = [...categories].sort((a, b) => a.order - b.order);
 ---

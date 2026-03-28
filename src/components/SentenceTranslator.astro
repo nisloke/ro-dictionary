@@ -171,7 +171,7 @@
 </style>
 
 <script>
-  import { fetchTerms, type TermEntry } from '../lib/dataStore';
+  import { fetchTerms, SUPABASE_URL, SUPABASE_ANON_KEY, type TermEntry } from '../lib/dataStore';
 
   // --- Types ---
   interface MatchedSegment {
@@ -334,10 +334,6 @@
   const estError = document.getElementById('translator-est-error')!;
   const spinner = document.getElementById('translator-spinner')!;
   const spinnerText = document.getElementById('translator-spinner-text')!;
-
-  // Supabase config (from dataStore)
-  const SUPABASE_URL = 'https://nyftkqzrbanrxcoaxzke.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZnRrcXpyYmFucnhjb2F4emtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzEyNzUsImV4cCI6MjA5MDI0NzI3NX0.j7tmgGPOB7L6Zm3SnegJsE69xD-szUvpDMTFOUouCEY';
 
   let isLoading = false;
 

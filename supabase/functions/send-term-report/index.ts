@@ -8,8 +8,14 @@ function isAuthorized(req: Request): boolean {
   if (!authHeader) return false;
 
   const token = authHeader.replace(/^Bearer\s+/i, "");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  return !!serviceRoleKey && token === serviceRoleKey;
+  try {
+    const payloadB64 = token.split(".")[1];
+    if (!payloadB64) return false;
+    const payload = JSON.parse(atob(payloadB64));
+    return payload.role === "service_role";
+  } catch {
+    return false;
+  }
 }
 
 // ---------------------------------------------------------------------------
