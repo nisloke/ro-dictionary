@@ -188,7 +188,7 @@
   interface EstimatedSegment {
     type: 'estimated';
     text: string;
-    fullName: string;
+    full_name: string;
     description: string;
   }
 
@@ -198,7 +198,7 @@
   const allTerms = await fetchTerms();
 
   // --- Build lookup map: key (lowercase) -> TermEntry ---
-  // Priority: term field > Korean name derived from fullName > tags (restricted)
+  // Priority: term field > Korean name derived from full_name > tags (restricted)
   const termLookup = new Map<string, TermEntry>();
   const termFieldKeys = new Set<string>();
 
@@ -209,12 +209,12 @@
     termFieldKeys.add(termKey);
   }
 
-  // Pass 2: derive Korean name variants from fullName
+  // Pass 2: derive Korean name variants from full_name
   // e.g. "룬 나이트 (Rune Knight)" → "룬 나이트", "룬나이트"
   for (const entry of allTerms) {
-    if (!entry.fullName) continue;
+    if (!entry.full_name) continue;
     // Strip parenthetical English part
-    const koreanPart = entry.fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
+    const koreanPart = entry.full_name.replace(/\s*\(.*?\)\s*/g, '').trim();
     if (koreanPart && koreanPart !== entry.term) {
       const key = koreanPart.toLowerCase();
       if (!termFieldKeys.has(key) && !termLookup.has(key)) {
@@ -415,11 +415,11 @@
         const tooltip = [seg.termData.term, seg.termData.description]
           .filter(Boolean)
           .join(' · ');
-        const displayName = seg.termData.fullName || seg.text;
+        const displayName = seg.termData.full_name || seg.text;
         return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}">${escapeHtml(displayName)}</a>`;
       } else if (seg.type === 'estimated') {
         const tooltip = `⚠️ 사전 미등재 · ${escapeHtml(seg.description)}`;
-        const displayName = seg.fullName || seg.text;
+        const displayName = seg.full_name || seg.text;
         return `<span class="term-estimated" data-tooltip="${tooltip}">${escapeHtml(displayName)}</span>`;
       } else {
         return escapeHtml(seg.text);
@@ -444,7 +444,7 @@
     dictCount.textContent = String(uniqueDict.length);
     dictList.innerHTML = uniqueDict.map((m) => {
       const desc = m.termData.description ? ` (${truncate(m.termData.description, 30)})` : '';
-      return `<li>${escapeHtml(m.termData.term)} \u2192 ${escapeHtml(m.termData.fullName)}${escapeHtml(desc)}</li>`;
+      return `<li>${escapeHtml(m.termData.term)} \u2192 ${escapeHtml(m.termData.full_name)}${escapeHtml(desc)}</li>`;
     }).join('');
 
     // Deduplicate estimated by text
@@ -459,7 +459,7 @@
     estCount.textContent = String(uniqueEst.length);
     estList.innerHTML = uniqueEst.map((e) => {
       const desc = e.description ? ` (${truncate(e.description, 30)})` : '';
-      return `<li>${escapeHtml(e.text)} \u2192 ${escapeHtml(e.fullName)}${escapeHtml(desc)}</li>`;
+      return `<li>${escapeHtml(e.text)} \u2192 ${escapeHtml(e.full_name)}${escapeHtml(desc)}</li>`;
     }).join('');
   }
 
@@ -522,16 +522,16 @@
       }
 
       const data = await response.json() as {
-        results: Array<{ term: string; isRoTerm: boolean; fullName?: string; description?: string }>;
+        results: Array<{ term: string; isRoTerm: boolean; fullName?: string; full_name?: string; description?: string }>;
       };
 
       // Build estimated segments map (only RO terms)
-      const estimatedMap = new Map<string, { fullName: string; description: string }>();
+      const estimatedMap = new Map<string, { full_name: string; description: string }>();
       if (data.results) {
         for (const r of data.results) {
           if (r.isRoTerm) {
             estimatedMap.set(r.term.toLowerCase(), {
-              fullName: r.fullName ?? r.term,
+              full_name: r.full_name ?? r.fullName ?? r.term,
               description: r.description ?? '',
             });
           }
@@ -565,7 +565,7 @@
   // --- Inject estimated terms into plain text ---
   function injectEstimates(
     text: string,
-    estimatedMap: Map<string, { fullName: string; description: string }>,
+    estimatedMap: Map<string, { full_name: string; description: string }>,
     collector: EstimatedSegment[]
   ): Segment[] {
     if (estimatedMap.size === 0) return [{ type: 'plain', text }];
@@ -590,7 +590,7 @@
           const estSeg: EstimatedSegment = {
             type: 'estimated',
             text: text.slice(i, i + key.length),
-            fullName: info.fullName,
+            full_name: info.full_name,
             description: info.description,
           };
           segments.push(estSeg);

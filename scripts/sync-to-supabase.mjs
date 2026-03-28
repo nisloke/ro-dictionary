@@ -42,10 +42,11 @@ const headers = {
 // ---- Load local data ----
 function loadLocalTerms() {
   const raw = JSON.parse(readFileSync(join(__dirname, '../src/data/terms.json'), 'utf-8'));
+  // terms.json now uses snake_case (full_name), matching Supabase directly
   return raw.map((t) => ({
     id: t.id,
     term: t.term,
-    full_name: t.fullName || null,
+    full_name: t.full_name || null,
     category: t.category,
     subcategory: t.subcategory || null,
     description: t.description || null,

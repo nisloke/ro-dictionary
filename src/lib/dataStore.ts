@@ -15,7 +15,7 @@ const SUPABASE_ANON_KEY =
 export interface TermEntry {
   id: string;
   term: string;
-  fullName: string;
+  full_name: string;
   category: string;
   subcategory: string;
   description: string;
@@ -29,48 +29,31 @@ export interface CategoryEntry {
   description: string;
 }
 
-// ---- Supabase row shapes (snake_case) ----------------------------------- //
-interface SupabaseTerm {
-  id: string;
-  term: string;
-  full_name: string | null;
-  category: string;
-  subcategory: string | null;
-  description: string | null;
-  tags: string[] | null;
-}
-
-interface SupabaseCategory {
-  code: string;
-  name: string;
-  order: number;
-  description: string | null;
-}
-
 // ---- Helpers ------------------------------------------------------------ //
 const headers = {
   apikey: SUPABASE_ANON_KEY,
   Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
 };
 
-function mapTerm(row: SupabaseTerm): TermEntry {
+/** Normalize nulls from Supabase rows into empty defaults */
+function normalizeTerm(row: Record<string, unknown>): TermEntry {
   return {
-    id: row.id,
-    term: row.term,
-    fullName: row.full_name ?? '',
-    category: row.category,
-    subcategory: row.subcategory ?? '',
-    description: row.description ?? '',
-    tags: row.tags ?? [],
+    id: (row.id as string) ?? '',
+    term: (row.term as string) ?? '',
+    full_name: (row.full_name as string) ?? '',
+    category: (row.category as string) ?? '',
+    subcategory: (row.subcategory as string) ?? '',
+    description: (row.description as string) ?? '',
+    tags: (row.tags as string[]) ?? [],
   };
 }
 
-function mapCategory(row: SupabaseCategory): CategoryEntry {
+function normalizeCategory(row: Record<string, unknown>): CategoryEntry {
   return {
-    code: row.code,
-    name: row.name,
-    order: row.order,
-    description: row.description ?? '',
+    code: (row.code as string) ?? '',
+    name: (row.name as string) ?? '',
+    order: (row.order as number) ?? 0,
+    description: (row.description as string) ?? '',
   };
 }
 
@@ -94,7 +77,7 @@ export function fetchTerms(): Promise<TermEntry[]> {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const rows: SupabaseTerm[] = await res.json();
-        return rows.map(mapTerm);
+        return rows.map(normalizeTerm);
       } catch (err) {
         console.warn('[dataStore] Supabase terms fetch failed, using fallback', err);
         return parseFallback<TermEntry>('terms-data', 'terms-for-translator');
@@ -118,7 +101,7 @@ export function fetchCategories(): Promise<CategoryEntry[]> {
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const rows: SupabaseCategory[] = await res.json();
-        return rows.map(mapCategory);
+        return rows.map(normalizeCategory);
       } catch (err) {
         console.warn('[dataStore] Supabase categories fetch failed, using fallback', err);
         return parseFallback<CategoryEntry>('categories-data');
