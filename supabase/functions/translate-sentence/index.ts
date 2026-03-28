@@ -203,7 +203,13 @@ Deno.serve(async (req: Request) => {
     }>;
 
     try {
-      results = JSON.parse(textBlock.text);
+      // Strip markdown code fences if present (```json ... ```)
+      let jsonText = textBlock.text.trim();
+      const fenceMatch = jsonText.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/);
+      if (fenceMatch) {
+        jsonText = fenceMatch[1].trim();
+      }
+      results = JSON.parse(jsonText);
     } catch {
       console.error("Failed to parse Sonnet JSON:", textBlock.text);
       return new Response(
