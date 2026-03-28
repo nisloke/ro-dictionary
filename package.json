@@ -6,9 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "sync-db": "node scripts/sync-to-supabase.mjs",
-    "setup-hooks": "node scripts/install-hooks.mjs"
+    "astro": "astro"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",

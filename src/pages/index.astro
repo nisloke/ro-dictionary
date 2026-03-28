@@ -6,9 +6,9 @@ import Search from '../components/Search.astro';
 import SentenceTranslator from '../components/SentenceTranslator.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import TermTable from '../components/TermTable.astro';
+import { fetchTerms, fetchCategories } from '../lib/dataStore';
 
-import categories from '../data/categories.json';
-import terms from '../data/terms.json';
+const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
 const totalCount = terms.length;
 const sorted = [...categories].sort((a, b) => a.order - b.order);

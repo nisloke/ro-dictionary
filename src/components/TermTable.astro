@@ -1,12 +1,13 @@
 ---
-import categories from '../data/categories.json';
-import allTerms from '../data/terms.json';
+import { fetchTerms, fetchCategories } from '../lib/dataStore';
 
 interface Props {
   category: string;
 }
 
 const { category } = Astro.props;
+
+const [allTerms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
 const catMeta = categories.find((c) => c.code === category);
 const catName = catMeta?.name ?? category;

@@ -1,6 +1,7 @@
 ---
-import categories from '../data/categories.json';
-import terms from '../data/terms.json';
+import { fetchTerms, fetchCategories } from '../lib/dataStore';
+
+const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
 const countByCategory = terms.reduce<Record<string, number>>((acc, t) => {
   acc[t.category] = (acc[t.category] || 0) + 1;

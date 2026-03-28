@@ -1,15 +1,17 @@
 /**
- * Shared runtime data store — fetches terms & categories from Supabase REST API.
- * Falls back to embedded JSON (build-time data) when the network is unavailable.
+ * Isomorphic data store — works at both BUILD TIME (Astro frontmatter)
+ * and RUNTIME (client-side <script>).
  *
- * Both Search.astro and SentenceTranslator.astro import from here so the data
- * is fetched only once and cached for the lifetime of the page.
+ * Single source of truth: Supabase.
+ * Client-side fallback: embedded <template> tags (for offline resilience).
  */
 
 // ---- Supabase config ---------------------------------------------------- //
 const SUPABASE_URL = 'https://nyftkqzrbanrxcoaxzke.supabase.co';
 const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZnRrcXpyYmFucnhjb2F4emtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzEyNzUsImV4cCI6MjA5MDI0NzI3NX0.j7tmgGPOB7L6Zm3SnegJsE69xD-szUvpDMTFOUouCEY';
+
+export { SUPABASE_URL, SUPABASE_ANON_KEY };
 
 // ---- Types -------------------------------------------------------------- //
 export interface TermEntry {
@@ -35,7 +37,6 @@ const headers = {
   Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
 };
 
-/** Normalize nulls from Supabase rows into empty defaults */
 function normalizeTerm(row: Record<string, unknown>): TermEntry {
   return {
     id: (row.id as string) ?? '',
@@ -57,7 +58,7 @@ function normalizeCategory(row: Record<string, unknown>): CategoryEntry {
   };
 }
 
-// ---- Cache -------------------------------------------------------------- //
+// ---- Cache (per-environment) -------------------------------------------- //
 let _termsPromise: Promise<TermEntry[]> | null = null;
 let _categoriesPromise: Promise<CategoryEntry[]> | null = null;
 
@@ -65,7 +66,7 @@ let _categoriesPromise: Promise<CategoryEntry[]> | null = null;
 
 /**
  * Fetch all terms from Supabase (cached after first call).
- * Falls back to the embedded `<template id="terms-data">` if present.
+ * Works at build time (Node) and runtime (browser).
  */
 export function fetchTerms(): Promise<TermEntry[]> {
   if (!_termsPromise) {
@@ -76,11 +77,15 @@ export function fetchTerms(): Promise<TermEntry[]> {
           { headers },
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const rows: SupabaseTerm[] = await res.json();
-        return rows.map(normalizeTerm);
+        const rows = await res.json();
+        return (rows as Record<string, unknown>[]).map(normalizeTerm);
       } catch (err) {
-        console.warn('[dataStore] Supabase terms fetch failed, using fallback', err);
-        return parseFallback<TermEntry>('terms-data', 'terms-for-translator');
+        console.warn('[dataStore] Supabase terms fetch failed', err);
+        // Client-side fallback: try embedded <template> tags
+        if (typeof document !== 'undefined') {
+          return parseFallback<TermEntry>('terms-data', 'terms-for-translator');
+        }
+        return [];
       }
     })();
   }
@@ -89,7 +94,6 @@ export function fetchTerms(): Promise<TermEntry[]> {
 
 /**
  * Fetch all categories from Supabase (cached after first call).
- * Falls back to `<template id="categories-data">` if present.
  */
 export function fetchCategories(): Promise<CategoryEntry[]> {
   if (!_categoriesPromise) {
@@ -100,18 +104,21 @@ export function fetchCategories(): Promise<CategoryEntry[]> {
           { headers },
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const rows: SupabaseCategory[] = await res.json();
-        return rows.map(normalizeCategory);
+        const rows = await res.json();
+        return (rows as Record<string, unknown>[]).map(normalizeCategory);
       } catch (err) {
-        console.warn('[dataStore] Supabase categories fetch failed, using fallback', err);
-        return parseFallback<CategoryEntry>('categories-data');
+        console.warn('[dataStore] Supabase categories fetch failed', err);
+        if (typeof document !== 'undefined') {
+          return parseFallback<CategoryEntry>('categories-data');
+        }
+        return [];
       }
     })();
   }
   return _categoriesPromise;
 }
 
-/** Try to parse build-time embedded JSON from <template> tags */
+/** Client-side only: parse build-time embedded JSON from <template> tags */
 function parseFallback<T>(...ids: string[]): T[] {
   for (const id of ids) {
     const el = document.getElementById(id);
