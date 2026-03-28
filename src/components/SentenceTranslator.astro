@@ -121,7 +121,8 @@
     text-decoration-color: rgb(249 115 22); /* dark:decoration-orange-500 */
   }
 
-  /* Tooltip via ::after */
+  /* Tooltip via ::after — only on hover-capable devices (no touch) */
+  @media (hover: hover) and (pointer: fine) {
   .term-dict[data-tooltip]:hover::after,
   .term-estimated[data-tooltip]:hover::after {
     content: attr(data-tooltip);
@@ -168,6 +169,7 @@
   :is(.dark .term-estimated[data-tooltip]:hover::before) {
     border-top-color: rgb(31 41 55);
   }
+  } /* end @media (hover: hover) */
 </style>
 
 <script>
@@ -412,11 +414,11 @@
           .filter(Boolean)
           .join(' · ');
         const displayName = seg.termData.full_name || seg.text;
-        return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}">${escapeHtml(displayName)}</a>`;
+        return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}" title="${escapeHtml(tooltip)}">${escapeHtml(displayName)}</a>`;
       } else if (seg.type === 'estimated') {
         const tooltip = `⚠️ 사전 미등재 · ${escapeHtml(seg.description)}`;
         const displayName = seg.full_name || seg.text;
-        return `<span class="term-estimated" data-tooltip="${tooltip}">${escapeHtml(displayName)}</span>`;
+        return `<span class="term-estimated" data-tooltip="${tooltip}" title="${escapeHtml(seg.description)}">${escapeHtml(displayName)}</span>`;
       } else {
         return escapeHtml(seg.text);
       }
