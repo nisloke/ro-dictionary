@@ -12,10 +12,10 @@ let enhanced = false;
 export function initAdminEnhancer(): void {
   onAdminChange(async (isAdmin) => {
     if (isAdmin && !enhanced) {
+      enhanced = true;
       await refreshTablesFromSupabase();
       enhanceTables();
       enhanceCategoryHeadings();
-      enhanced = true;
     }
     // On logout, page will be reloaded from AdminLogin.astro
   });
