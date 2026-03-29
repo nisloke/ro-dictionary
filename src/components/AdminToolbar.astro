@@ -39,7 +39,8 @@
 </div>
 
 <script>
-  import { onAdminChange, getSession } from '../lib/authStore';
+  import { onAdminChange } from '../lib/authStore';
+  import { getSupabase } from '../lib/supabaseClient';
   import { initAdminEnhancer, saveAllModifiedRows } from '../lib/adminEnhancer';
   import * as api from '../lib/adminApi';
   import { fetchTerms, fetchCategories, buildSubcategoryMap, SUPABASE_ANON_KEY } from '../lib/dataStore';
@@ -200,7 +201,8 @@
   deployBtn.addEventListener('click', async () => {
     if (!confirm('사이트를 재배포하시겠습니까? (약 1~2분 소요)')) return;
 
-    const session = getSession();
+    const supabase = await getSupabase();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
       showToast('배포 트리거 실패: 로그인 세션이 없습니다.', true);
       return;
