@@ -251,6 +251,33 @@ function getRowChanges(
   return Object.keys(changes).length > 0 ? changes : null;
 }
 
+/** Batch-save all modified rows. Called from AdminToolbar. */
+export async function saveAllModifiedRows(): Promise<{ saved: number; errors: number }> {
+  const rows = document.querySelectorAll<HTMLTableRowElement>('main table tbody tr.admin-row-modified');
+  let saved = 0;
+  let errors = 0;
+
+  for (const row of rows) {
+    const termId = row.id;
+    const changes = getRowChanges(row);
+    if (!termId || !changes) continue;
+    try {
+      await api.updateTerm(termId, changes);
+      // Update data-original attributes
+      row.querySelectorAll<HTMLTableCellElement>('td[data-field]').forEach((cell) => {
+        cell.setAttribute('data-original', cell.textContent?.trim() ?? '');
+      });
+      row.classList.remove('admin-row-modified');
+      const saveBtn = row.querySelector<HTMLButtonElement>('.admin-save-row-btn');
+      if (saveBtn) saveBtn.classList.add('hidden');
+      saved++;
+    } catch {
+      errors++;
+    }
+  }
+  return { saved, errors };
+}
+
 // ---- Category/Subcategory heading enhancement --------------------------- //
 
 function enhanceCategoryHeadings(): void {
@@ -412,17 +439,36 @@ async function showMoveTermDialog(
   row: HTMLTableRowElement,
 ): Promise<void> {
   let categories: { code: string; name: string }[];
+  let terms: { category: string; subcategory: string }[];
   try {
-    categories = await fetchCategories();
+    [categories, terms] = await Promise.all([fetchCategories(), fetchTerms()]);
   } catch (err) {
-    showToast(`카테고리 목록 로드 실패: ${(err as Error).message}`, true);
+    showToast(`데이터 로드 실패: ${(err as Error).message}`, true);
     return;
+  }
+
+  // Build subcategory list per category
+  const subcatByCat = new Map<string, string[]>();
+  for (const t of terms) {
+    if (!t.subcategory) continue;
+    const list = subcatByCat.get(t.category) ?? [];
+    if (!list.includes(t.subcategory)) list.push(t.subcategory);
+    subcatByCat.set(t.category, list);
+  }
+
+  function buildSubcatOptions(catCode: string, selected: string): string {
+    const subs = subcatByCat.get(catCode) ?? [];
+    let html = '<option value="">(없음)</option>';
+    for (const s of subs) {
+      html += `<option value="${s}"${s === selected ? ' selected' : ''}>${s}</option>`;
+    }
+    return html;
   }
 
   const backdrop = document.createElement('div');
   backdrop.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
 
-  const optionsHtml = categories
+  const catOptionsHtml = categories
     .map(
       (c) =>
         `<option value="${c.code}"${c.code === currentCategory ? ' selected' : ''}>${c.name} (${c.code})</option>`,
@@ -437,14 +483,15 @@ async function showMoveTermDialog(
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">카테고리</label>
           <select name="category"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-            ${optionsHtml}
+            ${catOptionsHtml}
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">소분류</label>
-          <input name="subcategory" type="text" value="${currentSubcategory}"
-            placeholder="소분류 (없으면 비워두세요)"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          <select name="subcategory"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+            ${buildSubcatOptions(currentCategory, currentSubcategory)}
+          </select>
         </div>
         <div class="flex gap-2 pt-1">
           <button type="submit" class="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 transition-colors">이동</button>
@@ -457,7 +504,14 @@ async function showMoveTermDialog(
   document.body.appendChild(backdrop);
 
   const form = backdrop.querySelector('form')!;
+  const catSelect = form.querySelector<HTMLSelectElement>('select[name="category"]')!;
+  const subSelect = form.querySelector<HTMLSelectElement>('select[name="subcategory"]')!;
   const cancelBtn = backdrop.querySelector('.admin-dialog-cancel')!;
+
+  // Update subcategory dropdown when category changes
+  catSelect.addEventListener('change', () => {
+    subSelect.innerHTML = buildSubcatOptions(catSelect.value, '');
+  });
 
   cancelBtn.addEventListener('click', () => backdrop.remove());
   backdrop.addEventListener('click', (e) => {
@@ -466,9 +520,8 @@ async function showMoveTermDialog(
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const fd = new FormData(form);
-    const newCategory = fd.get('category') as string;
-    const newSubcategory = (fd.get('subcategory') as string).trim();
+    const newCategory = catSelect.value;
+    const newSubcategory = subSelect.value;
 
     if (newCategory === currentCategory && newSubcategory === currentSubcategory) {
       backdrop.remove();

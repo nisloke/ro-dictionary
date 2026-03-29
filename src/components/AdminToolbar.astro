@@ -21,6 +21,13 @@
         + 용어 추가
       </button>
       <button
+        id="admin-batch-save-btn"
+        type="button"
+        class="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors"
+      >
+        일괄 저장
+      </button>
+      <button
         id="admin-deploy-btn"
         type="button"
         class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
@@ -33,12 +40,13 @@
 
 <script>
   import { onAdminChange, getSession } from '../lib/authStore';
-  import { initAdminEnhancer } from '../lib/adminEnhancer';
+  import { initAdminEnhancer, saveAllModifiedRows } from '../lib/adminEnhancer';
   import * as api from '../lib/adminApi';
   import { fetchTerms, fetchCategories, buildSubcategoryMap, SUPABASE_ANON_KEY } from '../lib/dataStore';
 
   const toolbar = document.getElementById('admin-toolbar')!;
   const addTermBtn = document.getElementById('admin-add-term-btn')!;
+  const batchSaveBtn = document.getElementById('admin-batch-save-btn')!;
   const deployBtn = document.getElementById('admin-deploy-btn')!;
 
   // Show/hide toolbar based on admin state
@@ -55,6 +63,32 @@
 
   // Initialize admin DOM enhancer
   initAdminEnhancer();
+
+  // Batch save all modified rows
+  batchSaveBtn.addEventListener('click', async () => {
+    const modifiedCount = document.querySelectorAll('.admin-row-modified').length;
+    if (modifiedCount === 0) {
+      showToast('변경된 항목이 없습니다.');
+      return;
+    }
+    batchSaveBtn.textContent = '저장 중...';
+    batchSaveBtn.setAttribute('disabled', 'true');
+    batchSaveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    try {
+      const { saved, errors } = await saveAllModifiedRows();
+      if (errors > 0) {
+        showToast(`${saved}개 저장, ${errors}개 실패`, true);
+      } else {
+        showToast(`${saved}개 항목이 저장되었습니다.`);
+      }
+    } catch (err) {
+      showToast(`오류: ${(err as Error).message}`, true);
+    } finally {
+      batchSaveBtn.textContent = '일괄 저장';
+      batchSaveBtn.removeAttribute('disabled');
+      batchSaveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  });
 
   // Add new term dialog
   addTermBtn.addEventListener('click', async () => {
