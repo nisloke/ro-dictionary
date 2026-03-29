@@ -37,6 +37,12 @@ async function refreshTablesFromSupabase(): Promise<void> {
           row.remove();
           return;
         }
+        // Term moved to a different category → remove from old table
+        const section = row.closest('section');
+        if (section && section.id !== fresh.category) {
+          row.remove();
+          return;
+        }
         const cells = row.querySelectorAll<HTMLTableCellElement>('td');
         if (cells.length < 3) return;
         cells[0].textContent = fresh.term;
