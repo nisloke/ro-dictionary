@@ -22,14 +22,14 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
 ---
 
 <Layout title="RO 용어 사전">
-  <Header totalCount={totalCount} />
-
-  <Search />
-
-  <SentenceTranslator />
+  <div id="sticky-header" class="sticky top-0 z-30 bg-gray-50 dark:bg-gray-950 -mt-6 pt-6 pb-2 transition-shadow duration-200">
+    <Header totalCount={totalCount} />
+    <Search />
+    <SentenceTranslator />
+  </div>
 
   <div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
-    <aside class="lg:w-64 shrink-0 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto scrollbar-thin">
+    <aside id="toc-aside" class="lg:w-64 shrink-0 lg:sticky lg:self-start lg:overflow-y-auto scrollbar-thin">
       <TableOfContents />
     </aside>
     <main class="flex-1 min-w-0">
@@ -41,3 +41,45 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
 
   <AdminToolbar />
 </Layout>
+
+<script is:inline>
+(function () {
+  var header = document.getElementById('sticky-header');
+  var aside = document.getElementById('toc-aside');
+  if (!header) return;
+
+  function syncLayout() {
+    var h = header.offsetHeight;
+    var isLg = window.innerWidth >= 1024;
+    if (aside && isLg) {
+      aside.style.top = (h + 12) + 'px';
+      aside.style.maxHeight = 'calc(100vh - ' + (h + 24) + 'px)';
+    } else if (aside) {
+      aside.style.top = '';
+      aside.style.maxHeight = '';
+    }
+    document.querySelectorAll('section[id], .scroll-mt-6[id]').forEach(function (el) {
+      el.style.scrollMarginTop = (h + 16) + 'px';
+    });
+  }
+
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(syncLayout).observe(header);
+  }
+  window.addEventListener('resize', syncLayout);
+  syncLayout();
+
+  // Shadow when header is stuck
+  var sentinel = document.createElement('div');
+  sentinel.style.height = '1px';
+  sentinel.style.marginTop = '-1px';
+  header.parentElement.insertBefore(sentinel, header);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      header.style.boxShadow = entries[0].isIntersecting
+        ? ''
+        : '0 2px 8px rgba(0,0,0,0.1)';
+    }).observe(sentinel);
+  }
+})();
+</script>
