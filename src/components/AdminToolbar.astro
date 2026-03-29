@@ -32,10 +32,10 @@
 </div>
 
 <script>
-  import { onAdminChange } from '../lib/authStore';
+  import { onAdminChange, getSession } from '../lib/authStore';
   import { initAdminEnhancer } from '../lib/adminEnhancer';
   import * as api from '../lib/adminApi';
-  import { fetchTerms, fetchCategories, buildSubcategoryMap } from '../lib/dataStore';
+  import { fetchTerms, fetchCategories, buildSubcategoryMap, SUPABASE_ANON_KEY } from '../lib/dataStore';
 
   const toolbar = document.getElementById('admin-toolbar')!;
   const addTermBtn = document.getElementById('admin-add-term-btn')!;
@@ -147,9 +147,72 @@
     });
   });
 
-  // Deploy button
-  deployBtn.addEventListener('click', () => {
-    const msg = '사이트에 변경 사항을 반영하려면 GitHub Actions에서 배포를 트리거해야 합니다.\n\n터미널에서 실행:\ngh workflow run deploy.yml --ref master\n\n또는 GitHub Actions 페이지에서 수동으로 실행하세요.';
-    alert(msg);
+  // Deploy button — trigger rebuild via Edge Function
+  function showToast(message: string, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-20 left-1/2 -translate-x-1/2 z-50 rounded-lg px-4 py-2 text-sm font-medium shadow-lg transition-opacity duration-300 ${
+      isError
+        ? 'bg-red-600 text-white'
+        : 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900'
+    }`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  deployBtn.addEventListener('click', async () => {
+    if (!confirm('사이트를 재배포하시겠습니까? (약 1~2분 소요)')) return;
+
+    const session = getSession();
+    if (!session?.access_token) {
+      showToast('배포 트리거 실패: 로그인 세션이 없습니다.', true);
+      return;
+    }
+
+    // Disable button while request is in progress
+    const originalText = deployBtn.textContent;
+    deployBtn.textContent = '배포 중...';
+    deployBtn.setAttribute('disabled', 'true');
+    deployBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    try {
+      const res = await fetch(
+        'https://nyftkqzrbanrxcoaxzke.supabase.co/functions/v1/trigger-rebuild',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        showToast('배포가 트리거되었습니다. 약 1~2분 후 반영됩니다.');
+      } else {
+        const errMsg = data.error || `HTTP ${res.status}`;
+        showToast(`배포 트리거 실패: ${errMsg}`, true);
+        // Fallback: show manual instructions
+        console.warn(
+          '[AdminToolbar] 배포 트리거 실패. 수동 실행: gh workflow run deploy.yml --ref master',
+        );
+      }
+    } catch (err) {
+      showToast(`배포 트리거 실패: ${(err as Error).message}`, true);
+      console.warn(
+        '[AdminToolbar] 네트워크 오류. 수동 실행: gh workflow run deploy.yml --ref master',
+      );
+    } finally {
+      // Re-enable button
+      deployBtn.textContent = originalText;
+      deployBtn.removeAttribute('disabled');
+      deployBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
   });
 </script>

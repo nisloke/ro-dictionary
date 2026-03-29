@@ -2,7 +2,7 @@
  * Authenticated CRUD operations for admin.
  * Uses Supabase JS client with user JWT — RLS enforces is_admin check.
  */
-import { supabase } from './supabaseClient';
+import { getSupabase } from './supabaseClient';
 import type { TermEntry, CategoryEntry } from './dataStore';
 
 // ---- Terms -------------------------------------------------------------- //
@@ -11,11 +11,13 @@ export async function updateTerm(
   id: string,
   data: Partial<Pick<TermEntry, 'term' | 'full_name' | 'description' | 'category' | 'subcategory' | 'tags'>>,
 ): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase.from('terms').update(data).eq('id', id);
   if (error) throw new Error(error.message);
 }
 
 export async function deleteTerm(id: string): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase.from('terms').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
@@ -23,6 +25,7 @@ export async function deleteTerm(id: string): Promise<void> {
 export async function createTerm(
   data: Omit<TermEntry, 'tags'> & { tags?: string[] },
 ): Promise<TermEntry> {
+  const supabase = await getSupabase();
   const row = { ...data, tags: data.tags ?? [] };
   const { data: result, error } = await supabase
     .from('terms')
@@ -39,11 +42,13 @@ export async function updateCategory(
   code: string,
   data: Partial<Pick<CategoryEntry, 'name' | 'order' | 'description'>>,
 ): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase.from('categories').update(data).eq('code', code);
   if (error) throw new Error(error.message);
 }
 
 export async function deleteCategory(code: string): Promise<void> {
+  const supabase = await getSupabase();
   // Delete all terms in this category first
   const { error: termsErr } = await supabase.from('terms').delete().eq('category', code);
   if (termsErr) throw new Error(termsErr.message);
@@ -52,6 +57,7 @@ export async function deleteCategory(code: string): Promise<void> {
 }
 
 export async function createCategory(data: CategoryEntry): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase.from('categories').insert(data);
   if (error) throw new Error(error.message);
 }
@@ -63,6 +69,7 @@ export async function renameSubcategory(
   oldName: string,
   newName: string,
 ): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase
     .from('terms')
     .update({ subcategory: newName })
@@ -75,6 +82,7 @@ export async function deleteSubcategory(
   categoryCode: string,
   subcategoryName: string,
 ): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase
     .from('terms')
     .delete()
@@ -88,6 +96,7 @@ export async function moveTerms(
   newCategory: string,
   newSubcategory: string,
 ): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase
     .from('terms')
     .update({ category: newCategory, subcategory: newSubcategory })

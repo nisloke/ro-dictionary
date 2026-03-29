@@ -58,7 +58,7 @@ function enhanceTables(): void {
     const thead = table.querySelector('thead tr');
     if (!thead) return;
     const th = document.createElement('th');
-    th.className = 'px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[120px]';
+    th.className = 'px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[160px]';
     th.textContent = '관리';
     thead.appendChild(th);
 
@@ -91,6 +91,7 @@ function enhanceTermRow(row: HTMLTableRowElement): void {
   actionTd.innerHTML = `
     <div class="flex gap-1">
       <button class="admin-save-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors hidden" title="저장">저장</button>
+      <button class="admin-move-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-purple-500 hover:bg-purple-600 transition-colors" title="이동">이동</button>
       <button class="admin-delete-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-red-500 hover:bg-red-600 transition-colors" title="삭제">삭제</button>
     </div>
   `;
@@ -118,6 +119,16 @@ function enhanceTermRow(row: HTMLTableRowElement): void {
       saveBtn.disabled = false;
       saveBtn.textContent = '저장';
     }
+  });
+
+  // Move button
+  const moveBtn = actionTd.querySelector<HTMLButtonElement>('.admin-move-row-btn')!;
+  moveBtn.addEventListener('click', () => {
+    const section = row.closest('section');
+    const currentCategory = section?.id ?? '';
+    const subcategoryH3 = row.closest('div.mb-6')?.querySelector<HTMLElement>('h3[data-subcategory]');
+    const currentSubcategory = subcategoryH3?.getAttribute('data-subcategory') ?? '';
+    showMoveTermDialog(termId, termCell.textContent?.trim() ?? '', currentCategory, currentSubcategory, row);
   });
 
   // Delete button
@@ -388,6 +399,96 @@ function addEditIcon(
       if (e.key === 'Enter') { e.preventDefault(); finish(true); }
       if (e.key === 'Escape') finish(false);
     });
+  });
+}
+
+// ---- Move Term Dialog --------------------------------------------------- //
+
+async function showMoveTermDialog(
+  termId: string,
+  termName: string,
+  currentCategory: string,
+  currentSubcategory: string,
+  row: HTMLTableRowElement,
+): Promise<void> {
+  let categories: { code: string; name: string }[];
+  try {
+    categories = await fetchCategories();
+  } catch (err) {
+    showToast(`카테고리 목록 로드 실패: ${(err as Error).message}`, true);
+    return;
+  }
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+
+  const optionsHtml = categories
+    .map(
+      (c) =>
+        `<option value="${c.code}"${c.code === currentCategory ? ' selected' : ''}>${c.name} (${c.code})</option>`,
+    )
+    .join('');
+
+  backdrop.innerHTML = `
+    <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">"${termName}" 이동</h3>
+      <form class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">카테고리</label>
+          <select name="category"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+            ${optionsHtml}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">소분류</label>
+          <input name="subcategory" type="text" value="${currentSubcategory}"
+            placeholder="소분류 (없으면 비워두세요)"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button type="submit" class="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 transition-colors">이동</button>
+          <button type="button" class="admin-dialog-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  const form = backdrop.querySelector('form')!;
+  const cancelBtn = backdrop.querySelector('.admin-dialog-cancel')!;
+
+  cancelBtn.addEventListener('click', () => backdrop.remove());
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) backdrop.remove();
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const newCategory = fd.get('category') as string;
+    const newSubcategory = (fd.get('subcategory') as string).trim();
+
+    if (newCategory === currentCategory && newSubcategory === currentSubcategory) {
+      backdrop.remove();
+      return;
+    }
+
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '이동 중...';
+      await api.moveTerms([termId], newCategory, newSubcategory);
+      backdrop.remove();
+      row.style.transition = 'opacity 0.3s';
+      row.style.opacity = '0.5';
+      showToast('용어가 이동되었습니다. 새로고침하면 반영됩니다.');
+    } catch (err) {
+      showToast(`오류: ${(err as Error).message}`, true);
+      submitBtn.disabled = false;
+      submitBtn.textContent = '이동';
+    }
   });
 }
 
