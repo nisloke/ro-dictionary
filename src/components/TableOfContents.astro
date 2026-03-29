@@ -1,5 +1,5 @@
 ---
-import { fetchTerms, fetchCategories } from '../lib/dataStore';
+import { fetchTerms, fetchCategories, buildSubcategoryMap } from '../lib/dataStore';
 
 const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
 
@@ -9,6 +9,7 @@ const countByCategory = terms.reduce<Record<string, number>>((acc, t) => {
 }, {});
 
 const sorted = [...categories].sort((a, b) => a.order - b.order);
+const subcatMap = buildSubcategoryMap(terms, categories);
 ---
 
 <nav aria-label="목차">
@@ -24,70 +25,248 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
       </svg>
     </button>
-    <div id="toc-mobile-list" class="hidden mt-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <div class="flex flex-wrap gap-2">
-        {sorted.map((cat) => (
-          <a
-            href={`#${cat.code}`}
-            class="toc-mobile-link flex-none rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
-          >
-            {cat.name}
-            <span class="ml-1 inline-flex items-center justify-center rounded-full bg-gray-200 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-              {countByCategory[cat.code] || 0}
-            </span>
-          </a>
-        ))}
-      </div>
+    <div id="toc-mobile-list" class="hidden mt-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <ul class="space-y-1">
+        {sorted.map((cat) => {
+          const subs = subcatMap.get(cat.code);
+          return (
+            <li>
+              <div class="flex items-center">
+                {subs ? (
+                  <button
+                    type="button"
+                    class="toc-mobile-cat-toggle shrink-0 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    data-cat={cat.code}
+                  >
+                    <svg class="h-3 w-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </button>
+                ) : (
+                  <span class="shrink-0 w-5" />
+                )}
+                <a
+                  href={`#${cat.code}`}
+                  class="toc-mobile-link flex-1 flex items-center justify-between rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+                  data-toc-cat={cat.code}
+                >
+                  <span>{cat.name}</span>
+                  <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-200 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                    {countByCategory[cat.code] || 0}
+                  </span>
+                </a>
+              </div>
+              {subs && (
+                <ul class="hidden toc-mobile-subcats pl-7 space-y-0.5 mt-0.5" data-cat-subs={cat.code}>
+                  {subs.map((s) => s.subcategory && (
+                    <li>
+                      <a
+                        href={`#${s.anchorId}`}
+                        class="toc-mobile-link flex items-center justify-between rounded-md px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                        data-toc-sub={s.anchorId}
+                      >
+                        <span>{s.subcategory}</span>
+                        <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-[10px] text-gray-400 dark:bg-gray-600 dark:text-gray-500">
+                          {s.termCount}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   </div>
 
-  {/* Desktop: sidebar list */}
+  {/* Desktop: sidebar tree */}
   <div class="hidden lg:block sticky top-6">
     <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
       목차
     </h2>
-    <ul class="space-y-1">
-      {sorted.map((cat) => (
-        <li>
-          <a
-            href={`#${cat.code}`}
-            class="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-          >
-            <span>{cat.name}</span>
-            <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-              {countByCategory[cat.code] || 0}
-            </span>
-          </a>
-        </li>
-      ))}
+    <ul class="space-y-0.5" id="toc-desktop-list">
+      {sorted.map((cat) => {
+        const subs = subcatMap.get(cat.code);
+        return (
+          <li>
+            <div class="flex items-center">
+              {subs ? (
+                <button
+                  type="button"
+                  class="toc-cat-toggle shrink-0 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  data-cat={cat.code}
+                  aria-expanded="false"
+                >
+                  <svg class="h-3 w-3 text-gray-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              ) : (
+                <span class="shrink-0 w-5" />
+              )}
+              <a
+                href={`#${cat.code}`}
+                class="toc-cat-link flex-1 flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+                data-toc-cat={cat.code}
+              >
+                <span>{cat.name}</span>
+                <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-xs text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                  {countByCategory[cat.code] || 0}
+                </span>
+              </a>
+            </div>
+            {subs && (
+              <ul class="hidden toc-subcats pl-7 space-y-0.5 mt-0.5" data-cat-subs={cat.code}>
+                {subs.map((s) => s.subcategory && (
+                  <li>
+                    <a
+                      href={`#${s.anchorId}`}
+                      class="toc-sub-link flex items-center justify-between rounded-md px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+                      data-toc-sub={s.anchorId}
+                    >
+                      <span>{s.subcategory}</span>
+                      <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 text-[10px] text-gray-400 dark:bg-gray-600 dark:text-gray-500">
+                        {s.termCount}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        );
+      })}
     </ul>
   </div>
 </nav>
 
 <script is:inline>
   (function () {
+    // ---- Mobile TOC toggle ----
     var toggle = document.getElementById('toc-toggle');
     var list = document.getElementById('toc-mobile-list');
     var chevron = document.getElementById('toc-chevron');
-    if (!toggle || !list || !chevron) return;
+    if (toggle && list && chevron) {
+      toggle.addEventListener('click', function () {
+        var isHidden = list.classList.contains('hidden');
+        if (isHidden) {
+          list.classList.remove('hidden');
+          chevron.classList.add('rotate-180');
+        } else {
+          list.classList.add('hidden');
+          chevron.classList.remove('rotate-180');
+        }
+      });
 
-    toggle.addEventListener('click', function () {
-      var isHidden = list.classList.contains('hidden');
-      if (isHidden) {
-        list.classList.remove('hidden');
-        chevron.classList.add('rotate-180');
-      } else {
-        list.classList.add('hidden');
-        chevron.classList.remove('rotate-180');
-      }
+      // Close mobile TOC when a navigation link is clicked
+      list.addEventListener('click', function (e) {
+        if (e.target.closest('.toc-mobile-link')) {
+          list.classList.add('hidden');
+          chevron.classList.remove('rotate-180');
+        }
+      });
+
+      // Mobile category toggle (expand/collapse subcategories)
+      list.querySelectorAll('.toc-mobile-cat-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var catCode = btn.getAttribute('data-cat');
+          var subList = list.querySelector('[data-cat-subs="' + catCode + '"]');
+          var svg = btn.querySelector('svg');
+          if (!subList || !svg) return;
+          var isHidden = subList.classList.contains('hidden');
+          if (isHidden) {
+            subList.classList.remove('hidden');
+            svg.style.transform = 'rotate(90deg)';
+          } else {
+            subList.classList.add('hidden');
+            svg.style.transform = '';
+          }
+        });
+      });
+    }
+
+    // ---- Desktop category toggle ----
+    document.querySelectorAll('.toc-cat-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var catCode = btn.getAttribute('data-cat');
+        var subList = document.querySelector('#toc-desktop-list [data-cat-subs="' + catCode + '"]');
+        var svg = btn.querySelector('svg');
+        if (!subList || !svg) return;
+        var isHidden = subList.classList.contains('hidden');
+        if (isHidden) {
+          subList.classList.remove('hidden');
+          svg.style.transform = 'rotate(90deg)';
+          btn.setAttribute('aria-expanded', 'true');
+        } else {
+          subList.classList.add('hidden');
+          svg.style.transform = '';
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
     });
 
-    // Close TOC when a link is clicked
-    list.addEventListener('click', function (e) {
-      if (e.target.closest('.toc-mobile-link')) {
-        list.classList.add('hidden');
-        chevron.classList.remove('rotate-180');
+    // ---- IntersectionObserver: highlight active TOC item ----
+    var activeClass = ['bg-blue-50', 'text-blue-700', 'dark:bg-blue-900/30', 'dark:text-blue-300'];
+    var currentActive = null;
+
+    function setActive(el) {
+      if (currentActive === el) return;
+      if (currentActive) {
+        activeClass.forEach(function (c) { currentActive.classList.remove(c); });
       }
-    });
+      currentActive = el;
+      if (el) {
+        activeClass.forEach(function (c) { el.classList.add(c); });
+        // Auto-expand parent category if this is a subcategory link
+        var parentSubsList = el.closest('.toc-subcats');
+        if (parentSubsList) {
+          var catCode = parentSubsList.getAttribute('data-cat-subs');
+          if (parentSubsList.classList.contains('hidden')) {
+            parentSubsList.classList.remove('hidden');
+            var toggleBtn = document.querySelector('#toc-desktop-list .toc-cat-toggle[data-cat="' + catCode + '"]');
+            if (toggleBtn) {
+              var svg = toggleBtn.querySelector('svg');
+              if (svg) svg.style.transform = 'rotate(90deg)';
+              toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+          }
+        }
+      }
+    }
+
+    // Observe all sections (categories) and subcategory divs
+    var targets = document.querySelectorAll('section[id], div.scroll-mt-6[id]');
+    if (targets.length > 0 && 'IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        // Find the topmost visible section
+        var visible = [];
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            visible.push(entry);
+          }
+        });
+        if (visible.length === 0) return;
+
+        // Pick the one closest to the top
+        visible.sort(function (a, b) {
+          return a.boundingClientRect.top - b.boundingClientRect.top;
+        });
+        var topEntry = visible[0];
+        var id = topEntry.target.id;
+
+        // Find matching TOC link (desktop)
+        var tocLink = document.querySelector('#toc-desktop-list a[data-toc-sub="' + id + '"]')
+          || document.querySelector('#toc-desktop-list a[data-toc-cat="' + id + '"]');
+        if (tocLink) setActive(tocLink);
+      }, {
+        rootMargin: '-10% 0px -70% 0px',
+        threshold: 0
+      });
+
+      targets.forEach(function (el) { observer.observe(el); });
+    }
   })();
 </script>

@@ -38,3 +38,16 @@ tr {
   background-color: theme(--color-blue-800);
   color: theme(--color-blue-100);
 }
+
+/* Admin: modified row indicator */
+.admin-row-modified {
+  box-shadow: inset 3px 0 0 theme(--color-blue-500);
+}
+.dark .admin-row-modified {
+  box-shadow: inset 3px 0 0 theme(--color-blue-400);
+}
+
+/* Admin: group-hover for edit icons */
+.group:hover .admin-edit-icon {
+  opacity: 1;
+}

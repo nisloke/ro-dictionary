@@ -1,0 +1,155 @@
+---
+// AdminToolbar: fixed bottom bar visible only to admin — global save/cancel
+---
+
+<div id="admin-toolbar" class="hidden fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur px-4 py-3 shadow-lg dark:border-gray-700 dark:bg-gray-900/95">
+  <div class="mx-auto flex max-w-6xl items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        관리자 모드
+      </span>
+      <span id="admin-pending-badge" class="hidden inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+        <span id="admin-pending-count">0</span>개 변경 대기
+      </span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button
+        id="admin-add-term-btn"
+        type="button"
+        class="rounded-lg border border-green-300 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50 transition-colors"
+      >
+        + 용어 추가
+      </button>
+      <button
+        id="admin-deploy-btn"
+        type="button"
+        class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+      >
+        사이트 반영
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { onAdminChange } from '../lib/authStore';
+  import { initAdminEnhancer } from '../lib/adminEnhancer';
+  import * as api from '../lib/adminApi';
+  import { fetchTerms, fetchCategories, buildSubcategoryMap } from '../lib/dataStore';
+
+  const toolbar = document.getElementById('admin-toolbar')!;
+  const addTermBtn = document.getElementById('admin-add-term-btn')!;
+  const deployBtn = document.getElementById('admin-deploy-btn')!;
+
+  // Show/hide toolbar based on admin state
+  onAdminChange((isAdmin) => {
+    if (isAdmin) {
+      toolbar.classList.remove('hidden');
+      // Add bottom padding to body so content isn't hidden behind toolbar
+      document.body.style.paddingBottom = '80px';
+    } else {
+      toolbar.classList.add('hidden');
+      document.body.style.paddingBottom = '';
+    }
+  });
+
+  // Initialize admin DOM enhancer
+  initAdminEnhancer();
+
+  // Add new term dialog
+  addTermBtn.addEventListener('click', async () => {
+    const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
+    const subcatMap = buildSubcategoryMap(terms, categories);
+    const sorted = [...categories].sort((a, b) => a.order - b.order);
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+
+    let catOptions = sorted.map((c) => `<option value="${c.code}">${c.name}</option>`).join('');
+
+    backdrop.innerHTML = `
+      <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800 max-h-[80vh] overflow-y-auto">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">새 용어 추가</h3>
+        <form class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">용어 (ID)</label>
+            <input name="id" type="text" required placeholder="드나"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">풀네임</label>
+            <input name="full_name" type="text" placeholder="드래곤 나이트 (Dragon Knight)"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">카테고리</label>
+            <select name="category" required
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+              ${catOptions}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">소분류</label>
+            <input name="subcategory" type="text" placeholder="(선택) 2차 직업"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">설명</label>
+            <textarea name="description" rows="2" placeholder="소드맨 2차"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 resize-y"></textarea>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">추가</button>
+            <button type="button" class="admin-dialog-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+
+    const form = backdrop.querySelector('form')!;
+    const cancelBtn = backdrop.querySelector('.admin-dialog-cancel')!;
+
+    cancelBtn.addEventListener('click', () => backdrop.remove());
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) backdrop.remove();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const id = (fd.get('id') as string).trim();
+      try {
+        await api.createTerm({
+          id,
+          term: id,
+          full_name: (fd.get('full_name') as string) || '',
+          category: fd.get('category') as string,
+          subcategory: (fd.get('subcategory') as string) || '',
+          description: (fd.get('description') as string) || '',
+          tags: [id],
+        });
+        backdrop.remove();
+        // Show toast
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 z-50 rounded-lg px-4 py-2 text-sm font-medium shadow-lg bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900 transition-opacity duration-300';
+        toast.textContent = '용어가 추가되었습니다. 페이지를 새로고침하면 반영됩니다.';
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+      } catch (err) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 z-50 rounded-lg px-4 py-2 text-sm font-medium shadow-lg bg-red-600 text-white transition-opacity duration-300';
+        toast.textContent = `오류: ${(err as Error).message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+      }
+    });
+  });
+
+  // Deploy button
+  deployBtn.addEventListener('click', () => {
+    const msg = '사이트에 변경 사항을 반영하려면 GitHub Actions에서 배포를 트리거해야 합니다.\n\n터미널에서 실행:\ngh workflow run deploy.yml --ref master\n\n또는 GitHub Actions 페이지에서 수동으로 실행하세요.';
+    alert(msg);
+  });
+</script>

@@ -1,5 +1,5 @@
 ---
-import { fetchTerms, fetchCategories } from '../lib/dataStore';
+import { fetchTerms, fetchCategories, slugifySubcategory } from '../lib/dataStore';
 
 interface Props {
   category: string;
@@ -36,9 +36,9 @@ const hasSubcategories = groups.some((g) => g.sub !== '');
 
   {hasSubcategories ? (
     groups.map((group) => (
-      <div class="mb-6">
+      <div class="mb-6 scroll-mt-6" id={group.sub ? slugifySubcategory(category, group.sub) : undefined}>
         {group.sub && (
-          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
+          <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2" data-subcategory={group.sub}>
             {group.sub}
           </h3>
         )}

@@ -1,4 +1,6 @@
 ---
+import AdminLogin from './AdminLogin.astro';
+
 interface Props {
   totalCount?: number;
 }
@@ -21,12 +23,14 @@ const { totalCount } = Astro.props;
         라그나로크 온라인 커뮤니티 축약어·은어 모음
       </p>
     </div>
-    <button
-      id="theme-toggle"
-      type="button"
-      aria-label="다크 모드 전환"
-      class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
-    >
+    <div class="flex items-center gap-1">
+      <AdminLogin />
+      <button
+        id="theme-toggle"
+        type="button"
+        aria-label="다크 모드 전환"
+        class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+      >
       <!-- Sun icon (shown in dark mode) -->
       <svg
         class="hidden dark:block h-5 w-5"
@@ -56,6 +60,7 @@ const { totalCount } = Astro.props;
         />
       </svg>
     </button>
+    </div>
   </div>
 </header>
 

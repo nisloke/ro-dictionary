@@ -6,6 +6,7 @@ import Search from '../components/Search.astro';
 import SentenceTranslator from '../components/SentenceTranslator.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import TermTable from '../components/TermTable.astro';
+import AdminToolbar from '../components/AdminToolbar.astro';
 import { fetchTerms, fetchCategories } from '../lib/dataStore';
 
 const [terms, categories] = await Promise.all([fetchTerms(), fetchCategories()]);
@@ -37,4 +38,6 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
   </div>
 
   <Footer lastUpdated="2026-03-28" />
+
+  <AdminToolbar />
 </Layout>

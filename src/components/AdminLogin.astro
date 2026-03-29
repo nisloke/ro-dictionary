@@ -1,0 +1,159 @@
+---
+// AdminLogin: small key icon in the header → login modal → admin badge + logout
+---
+
+<!-- Admin login trigger button -->
+<button
+  id="admin-login-btn"
+  type="button"
+  class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+  title="관리자 로그인"
+  aria-label="관리자 로그인"
+>
+  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+  </svg>
+</button>
+
+<!-- Admin badge (hidden by default, shown when logged in) -->
+<div id="admin-badge" class="hidden flex items-center gap-1">
+  <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+    Admin
+  </span>
+  <button
+    id="admin-logout-btn"
+    type="button"
+    class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+    title="로그아웃"
+    aria-label="로그아웃"
+  >
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+    </svg>
+  </button>
+</div>
+
+<!-- Login modal backdrop -->
+<div id="admin-modal-backdrop" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+  <div id="admin-modal" class="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">관리자 로그인</h3>
+    <form id="admin-login-form" class="space-y-3">
+      <div>
+        <label for="admin-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이메일</label>
+        <input
+          id="admin-email"
+          type="email"
+          required
+          autocomplete="email"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          placeholder="admin@example.com"
+        />
+      </div>
+      <div>
+        <label for="admin-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">비밀번호</label>
+        <input
+          id="admin-password"
+          type="password"
+          required
+          autocomplete="current-password"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          placeholder="********"
+        />
+      </div>
+      <div id="admin-login-error" class="hidden text-sm text-red-600 dark:text-red-400"></div>
+      <div class="flex gap-2 pt-1">
+        <button
+          type="submit"
+          id="admin-submit-btn"
+          class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          로그인
+        </button>
+        <button
+          type="button"
+          id="admin-cancel-btn"
+          class="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+        >
+          취소
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  import { signIn, signOut, onAdminChange } from '../lib/authStore';
+
+  const loginBtn = document.getElementById('admin-login-btn')!;
+  const badge = document.getElementById('admin-badge')!;
+  const logoutBtn = document.getElementById('admin-logout-btn')!;
+  const backdrop = document.getElementById('admin-modal-backdrop')!;
+  const form = document.getElementById('admin-login-form') as HTMLFormElement;
+  const emailInput = document.getElementById('admin-email') as HTMLInputElement;
+  const passwordInput = document.getElementById('admin-password') as HTMLInputElement;
+  const errorDiv = document.getElementById('admin-login-error')!;
+  const submitBtn = document.getElementById('admin-submit-btn') as HTMLButtonElement;
+  const cancelBtn = document.getElementById('admin-cancel-btn')!;
+
+  function openModal() {
+    backdrop.classList.remove('hidden');
+    errorDiv.classList.add('hidden');
+    emailInput.value = '';
+    passwordInput.value = '';
+    emailInput.focus();
+  }
+
+  function closeModal() {
+    backdrop.classList.add('hidden');
+  }
+
+  // Open modal
+  loginBtn.addEventListener('click', openModal);
+
+  // Close modal
+  cancelBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !backdrop.classList.contains('hidden')) closeModal();
+  });
+
+  // Login submit
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = '로그인 중...';
+    errorDiv.classList.add('hidden');
+
+    const { error } = await signIn(emailInput.value, passwordInput.value);
+
+    if (error) {
+      errorDiv.textContent = error;
+      errorDiv.classList.remove('hidden');
+      submitBtn.disabled = false;
+      submitBtn.textContent = '로그인';
+    } else {
+      closeModal();
+      submitBtn.disabled = false;
+      submitBtn.textContent = '로그인';
+    }
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', async () => {
+    await signOut();
+    location.reload();
+  });
+
+  // React to auth state
+  onAdminChange((isAdmin) => {
+    if (isAdmin) {
+      loginBtn.classList.add('hidden');
+      badge.classList.remove('hidden');
+    } else {
+      loginBtn.classList.remove('hidden');
+      badge.classList.add('hidden');
+    }
+  });
+</script>

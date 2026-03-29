@@ -118,6 +118,46 @@ export function fetchCategories(): Promise<CategoryEntry[]> {
   return _categoriesPromise;
 }
 
+// ---- Subcategory helpers ------------------------------------------------ //
+export interface SubcategoryGroup {
+  subcategory: string;
+  anchorId: string;
+  termCount: number;
+}
+
+export function slugifySubcategory(catCode: string, sub: string): string {
+  if (!sub) return '';
+  return `${catCode}--${sub.replace(/\s+/g, '-')}`;
+}
+
+export function buildSubcategoryMap(
+  terms: TermEntry[],
+  categories: CategoryEntry[],
+): Map<string, SubcategoryGroup[]> {
+  const map = new Map<string, SubcategoryGroup[]>();
+  for (const cat of categories) {
+    const catTerms = terms.filter((t) => t.category === cat.code);
+    const groups: SubcategoryGroup[] = [];
+    const seen = new Set<string>();
+    for (const t of catTerms) {
+      const key = t.subcategory ?? '';
+      if (!seen.has(key)) {
+        seen.add(key);
+        groups.push({
+          subcategory: key,
+          anchorId: key ? slugifySubcategory(cat.code, key) : '',
+          termCount: 0,
+        });
+      }
+      groups.find((g) => g.subcategory === key)!.termCount++;
+    }
+    if (groups.length > 0 && groups.some((g) => g.subcategory !== '')) {
+      map.set(cat.code, groups);
+    }
+  }
+  return map;
+}
+
 /** Client-side only: parse build-time embedded JSON from <template> tags */
 function parseFallback<T>(...ids: string[]): T[] {
   for (const id of ids) {
