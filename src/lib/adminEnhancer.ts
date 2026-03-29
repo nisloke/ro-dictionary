@@ -5,6 +5,7 @@
 import { onAdminChange } from './authStore';
 import * as api from './adminApi';
 import { addChange } from './adminState';
+import type { TermEntry } from './dataStore';
 import { fetchTerms, fetchCategories, buildSubcategoryMap, invalidateCache } from './dataStore';
 
 let enhanced = false;
@@ -29,29 +30,105 @@ async function refreshTablesFromSupabase(): Promise<void> {
     const freshTerms = await fetchTerms();
     const freshMap = new Map(freshTerms.map((t) => [t.id, t]));
 
+    // Track which term IDs exist in the DOM
+    const domIds = new Set<string>();
+    // Terms that moved to a different category/subcategory and need re-adding
+    const termsToAdd: TermEntry[] = [];
+
     document
       .querySelectorAll<HTMLTableRowElement>('main table tbody tr[id]')
       .forEach((row) => {
+        domIds.add(row.id);
         const fresh = freshMap.get(row.id);
         if (!fresh) {
           row.remove();
           return;
         }
-        // Term moved to a different category → remove from old table
+        // Check if term moved to a different category
         const section = row.closest('section');
         if (section && section.id !== fresh.category) {
           row.remove();
+          termsToAdd.push(fresh);
           return;
         }
+        // Check if term moved to a different subcategory within same category
+        const wrapper = row.closest('div.mb-6');
+        const subH3 = wrapper?.querySelector<HTMLElement>('h3[data-subcategory]');
+        const currentSub = subH3?.getAttribute('data-subcategory') ?? '';
+        if (currentSub !== (fresh.subcategory ?? '')) {
+          row.remove();
+          termsToAdd.push(fresh);
+          return;
+        }
+        // Update cell content in-place
         const cells = row.querySelectorAll<HTMLTableCellElement>('td');
         if (cells.length < 3) return;
         cells[0].textContent = fresh.term;
         cells[1].textContent = fresh.full_name;
         cells[2].textContent = fresh.description;
       });
+
+    // Add moved terms to their new sections
+    for (const term of termsToAdd) {
+      addTermRowToSection(term);
+    }
+
+    // Add terms that exist in Supabase but not yet in DOM (newly created)
+    for (const term of freshTerms) {
+      if (!domIds.has(term.id)) {
+        addTermRowToSection(term);
+      }
+    }
   } catch (err) {
     console.warn('[adminEnhancer] Failed to refresh from Supabase', err);
   }
+}
+
+/** Create a term row and append it to the correct section/subcategory table. */
+function addTermRowToSection(term: TermEntry): void {
+  const targetSection = document.getElementById(term.category);
+  if (!targetSection || targetSection.tagName !== 'SECTION') return;
+
+  let tbody: HTMLTableSectionElement | null = null;
+
+  // Try to find the subcategory's specific table
+  if (term.subcategory) {
+    const subH3 = targetSection.querySelector<HTMLElement>(
+      `h3[data-subcategory="${CSS.escape(term.subcategory)}"]`,
+    );
+    if (subH3) {
+      const wrapper = subH3.closest('div.mb-6');
+      tbody = wrapper?.querySelector('tbody') ?? null;
+    }
+  }
+
+  // Fallback: first table in the section
+  if (!tbody) {
+    tbody = targetSection.querySelector('tbody');
+  }
+
+  if (!tbody) return;
+
+  const tr = document.createElement('tr');
+  tr.id = term.id;
+  tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors';
+
+  const tdTerm = document.createElement('td');
+  tdTerm.className = 'px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100';
+  tdTerm.textContent = term.term;
+
+  const tdFullName = document.createElement('td');
+  tdFullName.className = 'px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap';
+  tdFullName.textContent = term.full_name;
+
+  const tdDesc = document.createElement('td');
+  tdDesc.className = 'px-3 py-2 text-gray-600 dark:text-gray-400';
+  tdDesc.textContent = term.description;
+
+  tr.appendChild(tdTerm);
+  tr.appendChild(tdFullName);
+  tr.appendChild(tdDesc);
+  tbody.appendChild(tr);
 }
 
 // ---- Term table enhancement --------------------------------------------- //
@@ -540,9 +617,22 @@ async function showMoveTermDialog(
       submitBtn.textContent = '이동 중...';
       await api.moveTerms([termId], newCategory, newSubcategory);
       backdrop.remove();
-      row.style.transition = 'opacity 0.3s';
-      row.style.opacity = '0.5';
-      showToast('용어가 이동되었습니다. 새로고침하면 반영됩니다.');
+      // Remove row from old table and add to new section immediately
+      const termData = row.querySelectorAll<HTMLTableCellElement>('td');
+      row.remove();
+      addTermRowToSection({
+        id: termId,
+        term: termData[0]?.textContent?.trim() ?? '',
+        full_name: termData[1]?.textContent?.trim() ?? '',
+        category: newCategory,
+        subcategory: newSubcategory,
+        description: termData[2]?.textContent?.trim() ?? '',
+        tags: [],
+      });
+      // Enhance the newly added row with admin controls
+      const newRow = document.getElementById(termId) as HTMLTableRowElement | null;
+      if (newRow) enhanceTermRow(newRow);
+      showToast('용어가 이동되었습니다.');
     } catch (err) {
       showToast(`오류: ${(err as Error).message}`, true);
       submitBtn.disabled = false;
