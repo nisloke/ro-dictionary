@@ -5,19 +5,47 @@
 import { onAdminChange } from './authStore';
 import * as api from './adminApi';
 import { addChange } from './adminState';
-import { fetchTerms, fetchCategories, buildSubcategoryMap } from './dataStore';
+import { fetchTerms, fetchCategories, buildSubcategoryMap, invalidateCache } from './dataStore';
 
 let enhanced = false;
 
 export function initAdminEnhancer(): void {
-  onAdminChange((isAdmin) => {
+  onAdminChange(async (isAdmin) => {
     if (isAdmin && !enhanced) {
+      await refreshTablesFromSupabase();
       enhanceTables();
       enhanceCategoryHeadings();
       enhanced = true;
     }
     // On logout, page will be reloaded from AdminLogin.astro
   });
+}
+
+// ---- Refresh static HTML from Supabase (admin sees latest data) --------- //
+
+async function refreshTablesFromSupabase(): Promise<void> {
+  try {
+    invalidateCache();
+    const freshTerms = await fetchTerms();
+    const freshMap = new Map(freshTerms.map((t) => [t.id, t]));
+
+    document
+      .querySelectorAll<HTMLTableRowElement>('main table tbody tr[id]')
+      .forEach((row) => {
+        const fresh = freshMap.get(row.id);
+        if (!fresh) {
+          row.remove();
+          return;
+        }
+        const cells = row.querySelectorAll<HTMLTableCellElement>('td');
+        if (cells.length < 3) return;
+        cells[0].textContent = fresh.term;
+        cells[1].textContent = fresh.full_name;
+        cells[2].textContent = fresh.description;
+      });
+  } catch (err) {
+    console.warn('[adminEnhancer] Failed to refresh from Supabase', err);
+  }
 }
 
 // ---- Term table enhancement --------------------------------------------- //

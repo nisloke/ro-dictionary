@@ -13,6 +13,12 @@ const SUPABASE_ANON_KEY =
 
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
 
+/** Clear cached promises so the next fetch hits Supabase again. */
+export function invalidateCache(): void {
+  _termsPromise = null;
+  _categoriesPromise = null;
+}
+
 // ---- Types -------------------------------------------------------------- //
 export interface TermEntry {
   id: string;

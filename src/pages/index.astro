@@ -29,7 +29,7 @@ const sorted = [...categories].sort((a, b) => a.order - b.order);
   <SentenceTranslator />
 
   <div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
-    <aside class="lg:w-64 shrink-0">
+    <aside class="lg:w-64 shrink-0 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto scrollbar-thin">
       <TableOfContents />
     </aside>
     <main class="flex-1 min-w-0">
