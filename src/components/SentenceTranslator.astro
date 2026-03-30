@@ -170,6 +170,30 @@
     border-top-color: rgb(31 41 55);
   }
   } /* end @media (hover: hover) */
+
+  /* 모바일 터치 툴팁 (JS로 삽입) */
+  .mobile-tooltip {
+    position: absolute;
+    transform: translate(-50%, -100%) translateY(-8px);
+    max-width: min(320px, calc(100vw - 16px));
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    z-index: 50;
+    pointer-events: none;
+    background-color: rgb(17 24 39);
+    color: rgb(243 244 246);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+
+  :is(.dark .mobile-tooltip) {
+    background-color: rgb(31 41 55);
+    color: rgb(229 231 235);
+  }
 </style>
 
 <script>
@@ -382,15 +406,91 @@
     }
   });
 
-  // --- Click delegation for term links in output ---
-  outputEl.addEventListener('click', (e) => {
-    const link = (e.target as HTMLElement).closest('.term-dict') as HTMLElement | null;
-    if (link) {
-      e.preventDefault();
-      const termId = link.dataset.termId;
-      if (termId) navigateToTerm(termId);
+  // --- Mobile touch tooltip ---
+  // 터치 디바이스에서 첫 탭 시 툴팁 표시, 두 번째 탭 시 네비게이션
+  let activeMobileTooltip: HTMLElement | null = null;
+
+  function showMobileTooltip(target: HTMLElement) {
+    dismissMobileTooltip();
+    const tooltipText = target.getAttribute('data-tooltip');
+    if (!tooltipText) return;
+
+    const tip = document.createElement('div');
+    tip.className = 'mobile-tooltip';
+    tip.textContent = tooltipText;
+    document.body.appendChild(tip);
+
+    // 위치 계산
+    const rect = target.getBoundingClientRect();
+    tip.style.left = `${Math.max(8, Math.min(rect.left + rect.width / 2, window.innerWidth - 8))}px`;
+    tip.style.top = `${rect.top + window.scrollY}px`;
+    activeMobileTooltip = tip;
+  }
+
+  function dismissMobileTooltip() {
+    if (activeMobileTooltip) {
+      activeMobileTooltip.remove();
+      activeMobileTooltip = null;
     }
-  });
+  }
+
+  // 터치 디바이스 감지: coarse pointer
+  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+  if (isTouchDevice) {
+    let lastTappedEl: HTMLElement | null = null;
+
+    outputEl.addEventListener('click', (e) => {
+      const term = (e.target as HTMLElement).closest('.term-dict, .term-estimated') as HTMLElement | null;
+      if (!term) {
+        dismissMobileTooltip();
+        lastTappedEl = null;
+        return;
+      }
+
+      e.preventDefault();
+
+      // .term-dict: 첫 탭 → 툴팁, 두 번째 탭 → 네비게이션
+      if (term.classList.contains('term-dict')) {
+        if (lastTappedEl === term) {
+          dismissMobileTooltip();
+          lastTappedEl = null;
+          const termId = term.dataset.termId;
+          if (termId) navigateToTerm(termId);
+        } else {
+          showMobileTooltip(term);
+          lastTappedEl = term;
+        }
+      } else {
+        // .term-estimated: 탭하면 툴팁 토글
+        if (lastTappedEl === term) {
+          dismissMobileTooltip();
+          lastTappedEl = null;
+        } else {
+          showMobileTooltip(term);
+          lastTappedEl = term;
+        }
+      }
+    });
+
+    // 다른 곳 탭 시 툴팁 닫기
+    document.addEventListener('click', (e) => {
+      if (!outputEl.contains(e.target as Node)) {
+        dismissMobileTooltip();
+        lastTappedEl = null;
+      }
+    });
+  } else {
+    // --- 데스크톱: 클릭 시 바로 네비게이션 ---
+    outputEl.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement).closest('.term-dict') as HTMLElement | null;
+      if (link) {
+        e.preventDefault();
+        const termId = link.dataset.termId;
+        if (termId) navigateToTerm(termId);
+      }
+    });
+  }
 
   // --- Set loading state ---
   function setLoading(loading: boolean) {
@@ -412,13 +512,13 @@
       if (seg.type === 'matched') {
         const tooltip = [seg.termData.term, seg.termData.description]
           .filter(Boolean)
-          .join(' · ');
+          .join(' \u00b7 ');
         const displayName = seg.termData.full_name || seg.text;
         return `<a href="javascript:void(0)" class="term-dict" data-term-id="${escapeHtml(seg.termData.id)}" data-tooltip="${escapeHtml(tooltip)}" title="${escapeHtml(tooltip)}">${escapeHtml(displayName)}</a>`;
       } else if (seg.type === 'estimated') {
-        const tooltip = `⚠️ 사전 미등재 · ${escapeHtml(seg.description)}`;
+        const tooltipText = `\u26a0\ufe0f 사전 미등재 \u00b7 ${seg.description}`;
         const displayName = seg.full_name || seg.text;
-        return `<span class="term-estimated" data-tooltip="${tooltip}" title="${escapeHtml(seg.description)}">${escapeHtml(displayName)}</span>`;
+        return `<span class="term-estimated" data-tooltip="${escapeHtml(tooltipText)}" title="${escapeHtml(tooltipText)}">${escapeHtml(displayName)}</span>`;
       } else {
         return escapeHtml(seg.text);
       }
