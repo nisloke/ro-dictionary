@@ -1,10 +1,12 @@
 // ---------------------------------------------------------------------------
 // Edge Function: trigger-rebuild
-// Triggers GitHub Actions deploy workflow via admin JWT authentication.
+// Triggers GitHub Actions deploy workflow. Admin-only.
+// Deployed with --no-verify-jwt; auth verified via supabase.auth.getUser().
 // ---------------------------------------------------------------------------
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ---------------------------------------------------------------------------
-// CORS helpers (same pattern as translate-sentence)
+// CORS helpers
 // ---------------------------------------------------------------------------
 const ALLOWED_ORIGINS = [
   "https://nisloke.github.io",
@@ -31,14 +33,6 @@ function corsHeaders(origin: string | null): Record<string, string> {
 }
 
 // ---------------------------------------------------------------------------
-// JWT helpers
-// ---------------------------------------------------------------------------
-function decodeJwt(token: string): Record<string, unknown> {
-  const payload = token.split(".")[1];
-  return JSON.parse(atob(payload));
-}
-
-// ---------------------------------------------------------------------------
 // Main handler
 // ---------------------------------------------------------------------------
 Deno.serve(async (req: Request) => {
@@ -58,39 +52,30 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    // ---- Authenticate & authorise admin ----
+    // ---- Authenticate & authorise admin via Supabase Auth ----
     const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "인증 토큰이 필요합니다." }),
         { status: 401, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    let payload: Record<string, unknown>;
-    try {
-      payload = decodeJwt(token);
-    } catch {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return new Response(
-        JSON.stringify({ error: "유효하지 않은 토큰입니다." }),
+        JSON.stringify({ error: "인증 실패: " + (authError?.message ?? "유효하지 않은 토큰") }),
         { status: 401, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
-    // Verify role is authenticated
-    if (payload.role !== "authenticated") {
-      return new Response(
-        JSON.stringify({ error: "인증된 사용자만 접근할 수 있습니다." }),
-        { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
-      );
-    }
-
-    // Verify admin via user_metadata
-    const userMetadata = payload.user_metadata as
-      | Record<string, unknown>
-      | undefined;
-    if (!userMetadata || userMetadata.is_admin !== true) {
+    if (user.user_metadata?.is_admin !== true) {
       return new Response(
         JSON.stringify({ error: "관리자 권한이 필요합니다." }),
         { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
@@ -122,11 +107,7 @@ Deno.serve(async (req: Request) => {
 
     if (!githubResponse.ok) {
       const errText = await githubResponse.text();
-      console.error(
-        "GitHub API error:",
-        githubResponse.status,
-        errText,
-      );
+      console.error("GitHub API error:", githubResponse.status, errText);
       return new Response(
         JSON.stringify({
           error: `GitHub 배포 트리거 실패 (HTTP ${githubResponse.status})`,
@@ -135,12 +116,8 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // GitHub returns 204 No Content on success
     return new Response(
-      JSON.stringify({
-        ok: true,
-        message: "배포가 트리거되었습니다.",
-      }),
+      JSON.stringify({ ok: true, message: "배포가 트리거되었습니다." }),
       { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
     );
   } catch (err) {

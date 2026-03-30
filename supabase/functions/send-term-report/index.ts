@@ -140,6 +140,7 @@ Deno.serve(async (req: Request) => {
       .from("unknown_terms")
       .select("id, term, suggested_full_name, suggested_description, suggested_category, search_count, first_seen_at")
       .eq("notified", false)
+      .eq("status", "pending")
       .order("search_count", { ascending: false });
 
     if (fetchError) {

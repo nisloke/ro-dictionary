@@ -103,3 +103,72 @@ export async function moveTerms(
     .in('id', termIds);
   if (error) throw new Error(error.message);
 }
+
+// ---- Unknown Terms ------------------------------------------------------ //
+
+export interface UnknownTermEntry {
+  id: number;
+  term: string;
+  suggested_full_name: string | null;
+  suggested_description: string | null;
+  suggested_category: string | null;
+  search_count: number;
+  first_seen_at: string;
+  last_seen_at: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewed_at: string | null;
+}
+
+export async function fetchUnknownTerms(
+  status?: 'pending' | 'approved' | 'rejected',
+): Promise<UnknownTermEntry[]> {
+  const supabase = await getSupabase();
+  let query = supabase
+    .from('unknown_terms')
+    .select('*')
+    .order('search_count', { ascending: false })
+    .order('last_seen_at', { ascending: false });
+  if (status) {
+    query = query.eq('status', status);
+  }
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return (data ?? []) as UnknownTermEntry[];
+}
+
+export async function approveUnknownTerm(
+  id: number,
+  termData: Omit<TermEntry, 'tags'> & { tags?: string[] },
+): Promise<void> {
+  await createTerm(termData);
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from('unknown_terms')
+    .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function rejectUnknownTerm(id: number): Promise<void> {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from('unknown_terms')
+    .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteUnknownTerm(id: number): Promise<void> {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from('unknown_terms').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateUnknownTerm(
+  id: number,
+  data: Partial<Pick<UnknownTermEntry, 'suggested_full_name' | 'suggested_description' | 'suggested_category'>>,
+): Promise<void> {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from('unknown_terms').update(data).eq('id', id);
+  if (error) throw new Error(error.message);
+}
