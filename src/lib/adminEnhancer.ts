@@ -396,6 +396,13 @@ function enhanceCategoryHeadings(): void {
       }
     });
     h2.appendChild(delBtn);
+
+    // "소분류 추가" button below category heading
+    const addSubBtn = document.createElement('button');
+    addSubBtn.className = 'admin-add-sub mt-1 mb-3 block rounded-lg border border-dashed border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-500 hover:border-blue-400 hover:text-blue-600 dark:border-gray-600 dark:text-gray-400 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-colors';
+    addSubBtn.textContent = '+ 소분류 추가';
+    addSubBtn.addEventListener('click', () => showAddSubcategoryDialog(catCode, section));
+    h2.insertAdjacentElement('afterend', addSubBtn);
   });
 
   // Subcategory headings (h3[data-subcategory])
@@ -403,39 +410,7 @@ function enhanceCategoryHeadings(): void {
     const subName = h3.getAttribute('data-subcategory')!;
     const section = h3.closest('section')!;
     const catCode = section.id;
-
-    addEditIcon(h3, async (newName) => {
-      try {
-        await api.renameSubcategory(catCode, subName, newName);
-        h3.setAttribute('data-subcategory', newName);
-        showToast('소분류 이름이 변경되었습니다');
-      } catch (err) {
-        showToast(`오류: ${(err as Error).message}`, true);
-        h3.childNodes[0].textContent = subName;
-      }
-    });
-
-    // Delete subcategory button
-    const delBtn = document.createElement('button');
-    delBtn.className = 'admin-sub-delete ml-2 p-0.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors';
-    delBtn.innerHTML = '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>';
-    delBtn.title = '소분류 삭제';
-    delBtn.addEventListener('click', async () => {
-      if (!confirm(`"${subName}" 소분류의 모든 용어를 삭제하시겠습니까?`)) return;
-      try {
-        await api.deleteSubcategory(catCode, subName);
-        const wrapper = h3.closest('div.mb-6');
-        if (wrapper) {
-          wrapper.style.transition = 'opacity 0.3s';
-          wrapper.style.opacity = '0';
-          setTimeout(() => wrapper.remove(), 300);
-        }
-        showToast('소분류가 삭제되었습니다');
-      } catch (err) {
-        showToast(`오류: ${(err as Error).message}`, true);
-      }
-    });
-    h3.appendChild(delBtn);
+    enhanceSubcategoryHeading(h3, catCode, subName);
   });
 
   // Add "new category" button at bottom of main
@@ -652,11 +627,6 @@ function showNewCategoryDialog(): void {
       <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">새 카테고리 추가</h3>
       <form class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">코드 (영문, 하이픈)</label>
-          <input name="code" type="text" required pattern="[a-z0-9\\-]+" placeholder="new-category"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
-        </div>
-        <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이름</label>
           <input name="name" type="text" required placeholder="카테고리 이름"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
@@ -664,11 +634,6 @@ function showNewCategoryDialog(): void {
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">순서</label>
           <input name="order" type="number" required value="99"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">설명</label>
-          <input name="description" type="text" placeholder="카테고리 설명"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
         </div>
         <div class="flex gap-2 pt-1">
@@ -692,12 +657,14 @@ function showNewCategoryDialog(): void {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
+    const name = (fd.get('name') as string).trim();
+    const code = `cat-${Date.now()}`;
     try {
       await api.createCategory({
-        code: fd.get('code') as string,
-        name: fd.get('name') as string,
+        code,
+        name,
         order: Number(fd.get('order')),
-        description: (fd.get('description') as string) || '',
+        description: '',
       });
       backdrop.remove();
       showToast('카테고리가 추가되었습니다. 페이지를 새로고침하면 반영됩니다.');
@@ -705,6 +672,221 @@ function showNewCategoryDialog(): void {
       showToast(`오류: ${(err as Error).message}`, true);
     }
   });
+}
+
+// ---- Subcategory heading enhancement -------------------------------------- //
+
+function enhanceSubcategoryHeading(h3: HTMLElement, catCode: string, subName: string): void {
+  // Edit icon that opens dialog with name + order
+  h3.classList.add('group');
+  h3.style.cursor = 'pointer';
+
+  const editBtn = document.createElement('button');
+  editBtn.className = 'admin-edit-icon ml-1 p-0.5 rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 transition-all';
+  editBtn.innerHTML = '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>';
+  editBtn.title = '소분류 수정';
+
+  const firstChild = h3.childNodes[0];
+  if (firstChild?.nextSibling) {
+    h3.insertBefore(editBtn, firstChild.nextSibling);
+  } else {
+    h3.appendChild(editBtn);
+  }
+
+  editBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showSubcategoryEditDialog(h3, catCode, h3.getAttribute('data-subcategory') ?? subName);
+  });
+
+  // Delete subcategory button
+  const delBtn = document.createElement('button');
+  delBtn.className = 'admin-sub-delete ml-2 p-0.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors';
+  delBtn.innerHTML = '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>';
+  delBtn.title = '소분류 삭제';
+  delBtn.addEventListener('click', async () => {
+    const currentSubName = h3.getAttribute('data-subcategory') ?? subName;
+    if (!confirm(`"${currentSubName}" 소분류의 모든 용어를 삭제하시겠습니까?`)) return;
+    try {
+      await api.deleteSubcategory(catCode, currentSubName);
+      const wrapper = h3.closest('div.mb-6');
+      if (wrapper) {
+        wrapper.style.transition = 'opacity 0.3s';
+        wrapper.style.opacity = '0';
+        setTimeout(() => wrapper.remove(), 300);
+      }
+      showToast('소분류가 삭제되었습니다');
+    } catch (err) {
+      showToast(`오류: ${(err as Error).message}`, true);
+    }
+  });
+  h3.appendChild(delBtn);
+}
+
+// ---- Subcategory Edit Dialog ---------------------------------------------- //
+
+function showSubcategoryEditDialog(heading: HTMLElement, catCode: string, currentName: string): void {
+  const section = heading.closest('section')!;
+  const wrappers = Array.from(section.querySelectorAll<HTMLElement>(':scope > div.mb-6'));
+  const currentWrapper = heading.closest<HTMLElement>('div.mb-6')!;
+  const currentPos = wrappers.indexOf(currentWrapper) + 1;
+  const totalSubs = wrappers.length;
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+  backdrop.innerHTML = `
+    <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">소분류 수정</h3>
+      <form class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">이름</label>
+          <input name="name" type="text" required
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">순서 (1~${totalSubs})</label>
+          <input name="order" type="number" required min="1" max="${totalSubs}"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">저장</button>
+          <button type="button" class="admin-dialog-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  const form = backdrop.querySelector('form')!;
+  const nameInput = form.querySelector<HTMLInputElement>('input[name="name"]')!;
+  const orderInput = form.querySelector<HTMLInputElement>('input[name="order"]')!;
+  nameInput.value = currentName;
+  orderInput.value = String(currentPos);
+  nameInput.focus();
+
+  const cancelBtn = backdrop.querySelector('.admin-dialog-cancel')!;
+  cancelBtn.addEventListener('click', () => backdrop.remove());
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.remove(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newName = nameInput.value.trim();
+    const newOrder = Number(orderInput.value);
+    if (!newName) return;
+
+    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = '저장 중...';
+
+      // Rename if name changed
+      if (newName !== currentName) {
+        await api.renameSubcategory(catCode, currentName, newName);
+        heading.childNodes[0].textContent = newName;
+        heading.setAttribute('data-subcategory', newName);
+      }
+
+      // Reorder if position changed
+      if (newOrder !== currentPos && newOrder >= 1 && newOrder <= totalSubs) {
+        const target = wrappers[newOrder - 1];
+        if (newOrder < currentPos) {
+          section.insertBefore(currentWrapper, target);
+        } else {
+          section.insertBefore(currentWrapper, target.nextSibling);
+        }
+      }
+
+      backdrop.remove();
+      showToast('소분류가 수정되었습니다');
+    } catch (err) {
+      showToast(`오류: ${(err as Error).message}`, true);
+      submitBtn.disabled = false;
+      submitBtn.textContent = '저장';
+    }
+  });
+}
+
+// ---- Add Subcategory Dialog ----------------------------------------------- //
+
+function showAddSubcategoryDialog(catCode: string, section: HTMLElement): void {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+  backdrop.innerHTML = `
+    <div class="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">소분류 추가</h3>
+      <form class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">소분류 이름</label>
+          <input name="name" type="text" required placeholder="소분류 이름"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">추가</button>
+          <button type="button" class="admin-dialog-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  const form = backdrop.querySelector('form')!;
+  const nameInput = form.querySelector<HTMLInputElement>('input[name="name"]')!;
+  nameInput.focus();
+
+  const cancelBtn = backdrop.querySelector('.admin-dialog-cancel')!;
+  cancelBtn.addEventListener('click', () => backdrop.remove());
+  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.remove(); });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    if (section.querySelector(`h3[data-subcategory="${CSS.escape(name)}"]`)) {
+      showToast('이미 존재하는 소분류입니다', true);
+      return;
+    }
+
+    createSubcategoryDOMSection(section, catCode, name);
+    backdrop.remove();
+    showToast('소분류가 추가되었습니다');
+  });
+}
+
+function createSubcategoryDOMSection(section: HTMLElement, catCode: string, subName: string): void {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'mb-6 scroll-mt-6';
+  wrapper.id = `${catCode}--${subName.replace(/\s+/g, '-')}`;
+
+  const h3 = document.createElement('h3');
+  h3.className = 'text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2';
+  h3.setAttribute('data-subcategory', subName);
+  h3.textContent = subName;
+
+  const tableWrap = document.createElement('div');
+  tableWrap.className = 'relative';
+  tableWrap.innerHTML = `
+    <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-thin">
+      <table class="min-w-[540px] w-full text-sm border-collapse rounded-lg border border-gray-200 dark:border-gray-700">
+        <thead>
+          <tr class="bg-gray-50 dark:bg-gray-800">
+            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[100px]">용어</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[140px]">풀네임</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300">설명</th>
+            <th class="px-3 py-2 text-left font-medium text-gray-700 dark:text-gray-300 w-[160px]">관리</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800"></tbody>
+      </table>
+    </div>
+  `;
+
+  wrapper.appendChild(h3);
+  wrapper.appendChild(tableWrap);
+  section.appendChild(wrapper);
+
+  enhanceSubcategoryHeading(h3, catCode, subName);
 }
 
 // ---- Toast notification ------------------------------------------------- //
