@@ -50,8 +50,10 @@
   import { onAdminChange } from '../lib/authStore';
   import { initAdminEnhancer, addTermRowToDom } from '../lib/adminEnhancer';
   import { addChange, cancelAll, commitAll, onPendingChange, getPendingCount } from '../lib/adminState';
-  import * as api from '../lib/adminApi';
   import type { UnknownTermEntry } from '../lib/adminApi';
+
+  /** Lazy-load adminApi to avoid bundling @supabase/supabase-js for every visitor */
+  const loadAdminApi = () => import('../lib/adminApi');
   import { fetchTerms, fetchCategories, buildSubcategoryMap } from '../lib/dataStore';
 
   const toolbar = document.getElementById('admin-toolbar')!;
@@ -90,7 +92,8 @@
       document.body.style.paddingBottom = '80px';
       // Load pending unknown terms count
       try {
-        const pending = await api.fetchUnknownTerms('pending');
+        const { fetchUnknownTerms } = await loadAdminApi();
+        const pending = await fetchUnknownTerms('pending');
         unknownCountBadge.textContent = String(pending.length);
       } catch { /* ignore — badge stays 0 */ }
     } else {
@@ -276,7 +279,8 @@
 
   async function refreshUnknownCount(): Promise<void> {
     try {
-      const pending = await api.fetchUnknownTerms('pending');
+      const { fetchUnknownTerms } = await loadAdminApi();
+      const pending = await fetchUnknownTerms('pending');
       unknownCountBadge.textContent = String(pending.length);
     } catch { /* ignore */ }
   }
@@ -347,7 +351,8 @@
     async function loadTerms(): Promise<void> {
       body.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">불러오는 중...</p>';
       try {
-        const terms = await api.fetchUnknownTerms(
+        const { fetchUnknownTerms } = await loadAdminApi();
+        const terms = await fetchUnknownTerms(
           activeFilter ? (activeFilter as 'pending' | 'approved' | 'rejected') : undefined,
         );
         if (terms.length === 0) {
@@ -405,7 +410,8 @@
           rejectBtn.className = 'text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 mr-2';
           rejectBtn.addEventListener('click', async () => {
             try {
-              await api.rejectUnknownTerm(t.id);
+              const { rejectUnknownTerm } = await loadAdminApi();
+              await rejectUnknownTerm(t.id);
               showToast('거부 처리되었습니다.');
               loadTerms();
               refreshUnknownCount();
@@ -421,7 +427,8 @@
         deleteBtn.addEventListener('click', async () => {
           if (!confirm(`"${t.term}" 항목을 삭제하시겠습니까?`)) return;
           try {
-            await api.deleteUnknownTerm(t.id);
+            const { deleteUnknownTerm } = await loadAdminApi();
+            await deleteUnknownTerm(t.id);
             showToast('삭제되었습니다.');
             loadTerms();
             refreshUnknownCount();

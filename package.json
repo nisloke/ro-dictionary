@@ -15,5 +15,8 @@
     "astro": "^5.18.1",
     "fuse.js": "^7.1.0",
     "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "supabase": "^2.84.6"
   }
 }

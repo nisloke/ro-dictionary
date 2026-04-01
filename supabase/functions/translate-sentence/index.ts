@@ -25,6 +25,7 @@ function isRateLimited(ip: string): boolean {
 // ---------------------------------------------------------------------------
 const ALLOWED_ORIGINS = [
   "https://nisloke.github.io",
+  "https://ro-dictionary.vercel.app",
 ];
 
 function isAllowedOrigin(origin: string | null): boolean {

@@ -79,7 +79,7 @@ export async function fetchTerms(): Promise<TermEntry[]> {
     const rows = await res.json();
     return (rows as Record<string, unknown>[]).map(normalizeTerm);
   } catch (err) {
-    console.warn('[dataStore] Supabase terms fetch failed', err);
+    console.error('[dataStore] Supabase terms fetch failed:', err);
     return [];
   }
 }
@@ -97,7 +97,7 @@ export async function fetchCategories(): Promise<CategoryEntry[]> {
     const rows = await res.json();
     return (rows as Record<string, unknown>[]).map(normalizeCategory);
   } catch (err) {
-    console.warn('[dataStore] Supabase categories fetch failed', err);
+    console.error('[dataStore] Supabase categories fetch failed:', err);
     return [];
   }
 }
