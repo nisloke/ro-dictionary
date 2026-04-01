@@ -186,6 +186,11 @@
             <textarea name="description" rows="2" placeholder="소드맨 2차"
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 resize-y"></textarea>
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">태그</label>
+            <input name="tags" type="text" placeholder="쉼표로 구분 (예: 드나, 드래곤나이트, DN)"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          </div>
           <div class="flex gap-2 pt-1">
             <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors">추가</button>
             <button type="button" class="admin-dialog-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
@@ -210,6 +215,9 @@
       const id = (fd.get('id') as string).trim();
       if (!id) return;
 
+      const tagsRaw = (fd.get('tags') as string) || '';
+      const parsedTags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
       const termData = {
         id,
         term: id,
@@ -217,7 +225,7 @@
         category: fd.get('category') as string,
         subcategory: (fd.get('subcategory') as string) || '',
         description: (fd.get('description') as string) || '',
-        tags: [id],
+        tags: parsedTags.length > 0 ? parsedTags : [id],
       };
 
       // Add row to DOM immediately
@@ -500,6 +508,11 @@
             <textarea name="description" rows="2"
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 resize-y">${esc(ut.suggested_description ?? '')}</textarea>
           </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">태그</label>
+            <input name="tags" type="text" value="${esc(ut.term)}" placeholder="쉼표로 구분 (예: 드나, 드래곤나이트, DN)"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100" />
+          </div>
           <div class="flex gap-2 pt-1">
             <button type="submit" class="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors">승인 및 등록</button>
             <button type="button" class="approve-cancel flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">취소</button>
@@ -524,6 +537,9 @@
       submitBtn.textContent = '처리 중...';
       submitBtn.disabled = true;
 
+      const tagsRaw = (fd.get('tags') as string) || '';
+      const parsedTags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
       const termData = {
         id,
         term: id,
@@ -531,7 +547,7 @@
         category: fd.get('category') as string,
         subcategory: (fd.get('subcategory') as string) || '',
         description: (fd.get('description') as string) || '',
-        tags: [id],
+        tags: parsedTags.length > 0 ? parsedTags : [id],
       };
 
       try {

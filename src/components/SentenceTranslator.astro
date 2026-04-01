@@ -599,7 +599,7 @@
       return;
     }
 
-    // Step 3: Call Supabase Edge Function for unknown terms
+    // Step 3: Call Supabase Edge Function for unknown terms (streaming)
     setLoading(true);
 
     try {
@@ -619,45 +619,111 @@
         throw new Error(`HTTP ${response.status}`);
       }
 
-      const data = await response.json() as {
-        results: Array<{ term: string; isRoTerm: boolean; fullName?: string; full_name?: string; description?: string }>;
-      };
+      const contentType = response.headers.get('content-type') ?? '';
 
-      // Build estimated segments map (only RO terms)
-      const estimatedMap = new Map<string, { full_name: string; description: string }>();
-      if (data.results) {
-        for (const r of data.results) {
-          if (r.isRoTerm) {
-            estimatedMap.set(r.term.toLowerCase(), {
-              full_name: r.full_name ?? r.fullName ?? r.term,
-              description: r.description ?? '',
-            });
-          }
+      // Handle streaming SSE response
+      if (contentType.includes('text/event-stream') && response.body) {
+        const accumulatedText = await readAnthropicStream(response.body);
+
+        // Parse the accumulated JSON
+        let jsonText = accumulatedText.trim();
+        const fenceMatch = jsonText.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/);
+        if (fenceMatch) {
+          jsonText = fenceMatch[1].trim();
+        }
+
+        const results = JSON.parse(jsonText) as Array<{
+          term: string; isRoTerm: boolean; fullName?: string; full_name?: string; description?: string;
+        }>;
+
+        applyEstimatedResults(results, segments, dictMatches);
+      } else {
+        // Fallback: non-streaming JSON response (backwards compatibility)
+        const data = await response.json() as {
+          results: Array<{ term: string; isRoTerm: boolean; fullName?: string; full_name?: string; description?: string }>;
+        };
+        if (data.results) {
+          applyEstimatedResults(data.results, segments, dictMatches);
         }
       }
-
-      // Rebuild segments with estimated terms
-      const finalSegments: Segment[] = [];
-      const estimatedSegments: EstimatedSegment[] = [];
-
-      for (const seg of segments) {
-        if (seg.type === 'plain') {
-          // Re-scan plain text for estimated terms
-          const rebuilt = injectEstimates(seg.text, estimatedMap, estimatedSegments);
-          finalSegments.push(...rebuilt);
-        } else {
-          finalSegments.push(seg);
-        }
-      }
-
-      outputEl.innerHTML = renderSegments(finalSegments);
-      renderSummary(dictMatches, estimatedSegments);
     } catch {
       estError.textContent = '서버 연결 실패. 사전 매칭 결과만 표시합니다.';
       estError.classList.remove('hidden');
     } finally {
       setLoading(false);
     }
+  }
+
+  // --- Read Anthropic SSE stream, accumulate text, update spinner with progress ---
+  async function readAnthropicStream(body: ReadableStream<Uint8Array>): Promise<string> {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let accumulated = '';
+    let sseBuffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      sseBuffer += decoder.decode(value, { stream: true });
+
+      // Process complete SSE lines
+      const lines = sseBuffer.split('\n');
+      // Keep the last potentially incomplete line in the buffer
+      sseBuffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (!data || data === '[DONE]') continue;
+
+        try {
+          const evt = JSON.parse(data);
+          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+            accumulated += evt.delta.text;
+            // Update spinner text with character count as progress indicator
+            spinnerText.textContent = `Sonnet 추정 중... (${accumulated.length}자 수신)`;
+          }
+        } catch {
+          // Ignore parse errors on partial data
+        }
+      }
+    }
+
+    return accumulated;
+  }
+
+  // --- Apply estimated results to the UI ---
+  function applyEstimatedResults(
+    results: Array<{ term: string; isRoTerm: boolean; fullName?: string; full_name?: string; description?: string }>,
+    segments: (MatchedSegment | PlainSegment)[],
+    dictMatches: MatchedSegment[],
+  ) {
+    const estimatedMap = new Map<string, { full_name: string; description: string }>();
+    for (const r of results) {
+      if (r.isRoTerm) {
+        estimatedMap.set(r.term.toLowerCase(), {
+          full_name: r.full_name ?? r.fullName ?? r.term,
+          description: r.description ?? '',
+        });
+      }
+    }
+
+    // Rebuild segments with estimated terms
+    const finalSegments: Segment[] = [];
+    const estimatedSegments: EstimatedSegment[] = [];
+
+    for (const seg of segments) {
+      if (seg.type === 'plain') {
+        const rebuilt = injectEstimates(seg.text, estimatedMap, estimatedSegments);
+        finalSegments.push(...rebuilt);
+      } else {
+        finalSegments.push(seg);
+      }
+    }
+
+    outputEl.innerHTML = renderSegments(finalSegments);
+    renderSummary(dictMatches, estimatedSegments);
   }
 
   // --- Inject estimated terms into plain text ---
