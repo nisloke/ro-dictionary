@@ -1,5 +1,6 @@
 /**
  * Tracks pending admin changes for batch save/cancel.
+ * All admin edits queue here; nothing hits Supabase until commitAll().
  */
 
 export type ChangeType =
@@ -15,7 +16,11 @@ export type ChangeType =
 
 export interface PendingChange {
   type: ChangeType;
+  /** Unique key for dedup — e.g. "update_term::드나" or "delete_term::abc123" */
+  key: string;
   payload: Record<string, unknown>;
+  /** Called when this change is cancelled to restore DOM to its previous state. */
+  undo?: () => void;
 }
 
 type ChangeListener = (count: number) => void;
@@ -28,9 +33,32 @@ function notify() {
   for (const fn of listeners) fn(count);
 }
 
+/**
+ * Add a change to the pending queue.
+ * If a change with the same `key` already exists, the old one is replaced
+ * (its undo is NOT called — only cancelAll/cancelChange invoke undo).
+ */
 export function addChange(change: PendingChange): void {
-  pending.push(change);
+  const idx = pending.findIndex((c) => c.key === change.key);
+  if (idx !== -1) {
+    // Replace existing — keep the new undo (which should restore to original state)
+    pending[idx] = change;
+  } else {
+    pending.push(change);
+  }
   notify();
+}
+
+/**
+ * Remove a single pending change by key, executing its undo callback.
+ */
+export function cancelChange(key: string): void {
+  const idx = pending.findIndex((c) => c.key === key);
+  if (idx !== -1) {
+    const removed = pending.splice(idx, 1)[0];
+    removed.undo?.();
+    notify();
+  }
 }
 
 export function getPendingChanges(): PendingChange[] {
@@ -41,7 +69,18 @@ export function getPendingCount(): number {
   return pending.length;
 }
 
+/** Clear all pending changes WITHOUT running undo callbacks. */
 export function clearAll(): void {
+  pending.length = 0;
+  notify();
+}
+
+/** Cancel all pending changes, running every undo callback to restore DOM. */
+export function cancelAll(): void {
+  // Run undos in reverse order so nested changes unwind correctly
+  for (let i = pending.length - 1; i >= 0; i--) {
+    pending[i].undo?.();
+  }
   pending.length = 0;
   notify();
 }
@@ -52,7 +91,11 @@ export function onPendingChange(fn: ChangeListener): () => void {
 }
 
 export async function commitAll(): Promise<{ success: boolean; errors: string[] }> {
-  const { updateTerm, deleteTerm, createTerm, updateCategory, deleteCategory, createCategory, renameSubcategory, deleteSubcategory, moveTerms } = await import('./adminApi');
+  const {
+    updateTerm, deleteTerm, createTerm,
+    updateCategory, deleteCategory, createCategory,
+    renameSubcategory, deleteSubcategory, moveTerms,
+  } = await import('./adminApi');
 
   const errors: string[] = [];
 

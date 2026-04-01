@@ -1,10 +1,12 @@
 /**
  * Admin DOM Enhancer — injects edit controls into the static HTML
  * when an admin is logged in. Strips them on logout.
+ *
+ * All mutations are queued via addChange() into the pending queue.
+ * Nothing touches Supabase until the user clicks "변경사항 저장".
  */
 import { onAdminChange } from './authStore';
-import * as api from './adminApi';
-import { addChange } from './adminState';
+import { addChange, cancelChange } from './adminState';
 import type { TermEntry } from './dataStore';
 import { fetchTerms, fetchCategories, buildSubcategoryMap, invalidateCache } from './dataStore';
 
@@ -20,6 +22,21 @@ export function initAdminEnhancer(): void {
     }
     // On logout, page will be reloaded from AdminLogin.astro
   });
+}
+
+/**
+ * Add a newly-created term row to the DOM from outside the enhancer
+ * (e.g. from AdminToolbar's "용어 추가" dialog).
+ * Returns the created <tr> so callers can set up undo logic.
+ */
+export function addTermRowToDom(term: TermEntry): HTMLTableRowElement | null {
+  addTermRowToSection(term);
+  const newRow = document.getElementById(term.id) as HTMLTableRowElement | null;
+  if (newRow) {
+    enhanceTermRow(newRow);
+    newRow.classList.add('admin-row-pending-create');
+  }
+  return newRow;
 }
 
 // ---- Refresh static HTML from Supabase (admin sees latest data) --------- //
@@ -173,36 +190,11 @@ function enhanceTermRow(row: HTMLTableRowElement): void {
   actionTd.className = 'px-3 py-2 whitespace-nowrap';
   actionTd.innerHTML = `
     <div class="flex gap-1">
-      <button class="admin-save-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors hidden" title="저장">저장</button>
       <button class="admin-move-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-purple-500 hover:bg-purple-600 transition-colors" title="이동">이동</button>
       <button class="admin-delete-row-btn rounded px-2 py-1 text-xs font-medium text-white bg-red-500 hover:bg-red-600 transition-colors" title="삭제">삭제</button>
     </div>
   `;
   row.appendChild(actionTd);
-
-  // Save button — immediate save for this row
-  const saveBtn = actionTd.querySelector<HTMLButtonElement>('.admin-save-row-btn')!;
-  saveBtn.addEventListener('click', async () => {
-    const changes = getRowChanges(row);
-    if (!changes) return;
-    try {
-      saveBtn.disabled = true;
-      saveBtn.textContent = '저장 중...';
-      await api.updateTerm(termId, changes);
-      // Update original data attributes
-      if (changes.term !== undefined) termCell.setAttribute('data-original', changes.term);
-      if (changes.full_name !== undefined) fullNameCell.setAttribute('data-original', changes.full_name);
-      if (changes.description !== undefined) descCell.setAttribute('data-original', changes.description);
-      row.classList.remove('admin-row-modified');
-      saveBtn.classList.add('hidden');
-      showToast('저장되었습니다');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.textContent = '저장';
-    }
-  });
 
   // Move button
   const moveBtn = actionTd.querySelector<HTMLButtonElement>('.admin-move-row-btn')!;
@@ -214,23 +206,46 @@ function enhanceTermRow(row: HTMLTableRowElement): void {
     showMoveTermDialog(termId, termCell.textContent?.trim() ?? '', currentCategory, currentSubcategory, row);
   });
 
-  // Delete button
+  // Delete button — queue pending deletion instead of immediate API call
   const deleteBtn = actionTd.querySelector<HTMLButtonElement>('.admin-delete-row-btn')!;
-  deleteBtn.addEventListener('click', async () => {
-    if (!confirm(`"${termCell.textContent?.trim()}" 용어를 삭제하시겠습니까?`)) return;
-    try {
-      deleteBtn.disabled = true;
-      deleteBtn.textContent = '삭제 중...';
-      await api.deleteTerm(termId);
-      row.style.transition = 'opacity 0.3s';
-      row.style.opacity = '0';
-      setTimeout(() => row.remove(), 300);
-      showToast('삭제되었습니다');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
-      deleteBtn.disabled = false;
-      deleteBtn.textContent = '삭제';
-    }
+  deleteBtn.addEventListener('click', () => {
+    const termName = termCell.textContent?.trim() ?? termId;
+    if (!confirm(`"${termName}" 용어를 삭제 대기열에 추가하시겠습니까?`)) return;
+
+    const changeKey = `delete_term::${termId}`;
+
+    // Mark row as pending-delete visually
+    row.classList.add('admin-row-pending-delete');
+
+    // Disable row interactions
+    row.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+      btn.disabled = true;
+    });
+
+    // Add an "undo delete" button
+    const undoBtn = document.createElement('button');
+    undoBtn.className = 'admin-undo-delete-btn rounded px-2 py-1 text-xs font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 dark:text-amber-300 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 transition-colors';
+    undoBtn.textContent = '취소';
+    undoBtn.disabled = false;
+    undoBtn.addEventListener('click', () => {
+      cancelChange(changeKey);
+    });
+    const actionsDiv = actionTd.querySelector('div')!;
+    actionsDiv.appendChild(undoBtn);
+
+    addChange({
+      type: 'delete_term',
+      key: changeKey,
+      payload: { id: termId },
+      undo: () => {
+        row.classList.remove('admin-row-pending-delete');
+        row.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+          btn.disabled = false;
+        });
+        undoBtn.remove();
+      },
+    });
+    showToast(`"${termName}" 삭제 대기 중`);
   });
 }
 
@@ -248,6 +263,8 @@ function makeEditable(
   cell.addEventListener('click', () => {
     // Already editing?
     if (cell.querySelector('input, textarea')) return;
+    // Row is pending delete — do not allow editing
+    if (cell.closest('tr')?.classList.contains('admin-row-pending-delete')) return;
 
     const currentValue = cell.textContent?.trim() ?? '';
     const isDesc = field === 'description';
@@ -266,7 +283,7 @@ function makeEditable(
         const newValue = textarea.value.trim();
         cell.textContent = newValue;
         if (newValue !== cell.getAttribute('data-original')) {
-          markRowModified(cell.closest('tr')!);
+          queueRowUpdate(cell.closest('tr') as HTMLTableRowElement, termId);
         }
       };
       textarea.addEventListener('blur', finish);
@@ -295,7 +312,7 @@ function makeEditable(
         const newValue = input.value.trim();
         cell.textContent = newValue;
         if (newValue !== cell.getAttribute('data-original')) {
-          markRowModified(cell.closest('tr')!);
+          queueRowUpdate(cell.closest('tr') as HTMLTableRowElement, termId);
         }
       };
       input.addEventListener('blur', finish);
@@ -313,10 +330,40 @@ function makeEditable(
   });
 }
 
-function markRowModified(row: HTMLTableRowElement): void {
+/**
+ * After a cell edit, gather ALL changed fields in the row and queue
+ * (or re-queue) a single update_term change.
+ */
+function queueRowUpdate(row: HTMLTableRowElement, termId: string): void {
+  const changes = getRowChanges(row);
+  if (!changes) {
+    // All fields reverted to original — remove the pending change
+    row.classList.remove('admin-row-modified');
+    cancelChange(`update_term::${termId}`);
+    return;
+  }
+
   row.classList.add('admin-row-modified');
-  const saveBtn = row.querySelector<HTMLButtonElement>('.admin-save-row-btn');
-  if (saveBtn) saveBtn.classList.remove('hidden');
+
+  // Capture original values for undo
+  const originals: Record<string, string> = {};
+  row.querySelectorAll<HTMLTableCellElement>('td[data-field]').forEach((cell) => {
+    originals[cell.getAttribute('data-field')!] = cell.getAttribute('data-original') ?? '';
+  });
+
+  addChange({
+    type: 'update_term',
+    key: `update_term::${termId}`,
+    payload: { id: termId, data: changes },
+    undo: () => {
+      // Restore cell text to original values
+      row.querySelectorAll<HTMLTableCellElement>('td[data-field]').forEach((cell) => {
+        const field = cell.getAttribute('data-field')!;
+        cell.textContent = originals[field] ?? '';
+      });
+      row.classList.remove('admin-row-modified');
+    },
+  });
 }
 
 function getRowChanges(
@@ -334,33 +381,6 @@ function getRowChanges(
   return Object.keys(changes).length > 0 ? changes : null;
 }
 
-/** Batch-save all modified rows. Called from AdminToolbar. */
-export async function saveAllModifiedRows(): Promise<{ saved: number; errors: number }> {
-  const rows = document.querySelectorAll<HTMLTableRowElement>('main table tbody tr.admin-row-modified');
-  let saved = 0;
-  let errors = 0;
-
-  for (const row of rows) {
-    const termId = row.id;
-    const changes = getRowChanges(row);
-    if (!termId || !changes) continue;
-    try {
-      await api.updateTerm(termId, changes);
-      // Update data-original attributes
-      row.querySelectorAll<HTMLTableCellElement>('td[data-field]').forEach((cell) => {
-        cell.setAttribute('data-original', cell.textContent?.trim() ?? '');
-      });
-      row.classList.remove('admin-row-modified');
-      const saveBtn = row.querySelector<HTMLButtonElement>('.admin-save-row-btn');
-      if (saveBtn) saveBtn.classList.add('hidden');
-      saved++;
-    } catch {
-      errors++;
-    }
-  }
-  return { saved, errors };
-}
-
 // ---- Category/Subcategory heading enhancement --------------------------- //
 
 function enhanceCategoryHeadings(): void {
@@ -368,14 +388,18 @@ function enhanceCategoryHeadings(): void {
   document.querySelectorAll<HTMLElement>('main section[id] > h2').forEach((h2) => {
     const section = h2.closest('section')!;
     const catCode = section.id;
-    addEditIcon(h2, async (newName) => {
-      try {
-        await api.updateCategory(catCode, { name: newName });
-        showToast('카테고리 이름이 변경되었습니다');
-      } catch (err) {
-        showToast(`오류: ${(err as Error).message}`, true);
-        h2.childNodes[0].textContent = h2.getAttribute('data-original') ?? '';
-      }
+    addEditIcon(h2, (newName) => {
+      const originalName = h2.getAttribute('data-original') ?? '';
+      addChange({
+        type: 'update_category',
+        key: `update_category::${catCode}`,
+        payload: { code: catCode, data: { name: newName } },
+        undo: () => {
+          h2.childNodes[0].textContent = originalName;
+          h2.setAttribute('data-original', originalName);
+        },
+      });
+      showToast('카테고리 이름 변경 대기 중');
     });
 
     // Add delete button for category
@@ -383,17 +407,22 @@ function enhanceCategoryHeadings(): void {
     delBtn.className = 'admin-cat-delete ml-2 p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors';
     delBtn.innerHTML = '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>';
     delBtn.title = '카테고리 삭제';
-    delBtn.addEventListener('click', async () => {
-      if (!confirm(`"${h2.textContent?.trim()}" 카테고리와 모든 용어를 삭제하시겠습니까?`)) return;
-      try {
-        await api.deleteCategory(catCode);
-        section.style.transition = 'opacity 0.3s';
-        section.style.opacity = '0';
-        setTimeout(() => section.remove(), 300);
-        showToast('카테고리가 삭제되었습니다');
-      } catch (err) {
-        showToast(`오류: ${(err as Error).message}`, true);
-      }
+    delBtn.addEventListener('click', () => {
+      if (!confirm(`"${h2.textContent?.trim()}" 카테고리와 모든 용어를 삭제 대기열에 추가하시겠습니까?`)) return;
+
+      const changeKey = `delete_category::${catCode}`;
+      // Visually mark as pending delete
+      section.classList.add('admin-row-pending-delete');
+
+      addChange({
+        type: 'delete_category',
+        key: changeKey,
+        payload: { code: catCode },
+        undo: () => {
+          section.classList.remove('admin-row-pending-delete');
+        },
+      });
+      showToast('카테고리 삭제 대기 중');
     });
     h2.appendChild(delBtn);
 
@@ -426,7 +455,7 @@ function enhanceCategoryHeadings(): void {
 
 function addEditIcon(
   heading: HTMLElement,
-  onSave: (newName: string) => Promise<void>,
+  onSave: (newName: string) => void,
 ): void {
   const originalText = heading.childNodes[0]?.textContent?.trim() ?? '';
   heading.setAttribute('data-original', originalText);
@@ -465,7 +494,7 @@ function addEditIcon(
     input.focus();
     input.select();
 
-    const finish = async (save: boolean) => {
+    const finish = (save: boolean) => {
       const newValue = input.value.trim();
       input.remove();
       children.forEach((c) => {
@@ -473,7 +502,7 @@ function addEditIcon(
       });
       if (save && newValue && newValue !== current) {
         heading.childNodes[0].textContent = newValue;
-        await onSave(newValue);
+        onSave(newValue);
       } else {
         heading.childNodes[0].textContent = current;
       }
@@ -513,6 +542,17 @@ async function showMoveTermDialog(
     if (!list.includes(t.subcategory)) list.push(t.subcategory);
     subcatByCat.set(t.category, list);
   }
+
+  // Include DOM-only subcategories (created via "소분류 추가" but not yet persisted)
+  document.querySelectorAll<HTMLElement>('main section[id]').forEach((sec) => {
+    const catCode = sec.id;
+    const list = subcatByCat.get(catCode) ?? [];
+    sec.querySelectorAll<HTMLElement>('h3[data-subcategory]').forEach((h3) => {
+      const sub = h3.getAttribute('data-subcategory') ?? '';
+      if (sub && !list.includes(sub)) list.push(sub);
+    });
+    if (list.length > 0) subcatByCat.set(catCode, list);
+  });
 
   function buildSubcatOptions(catCode: string, selected: string): string {
     const subs = subcatByCat.get(catCode) ?? [];
@@ -576,7 +616,7 @@ async function showMoveTermDialog(
     if (e.target === backdrop) backdrop.remove();
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     const newCategory = catSelect.value;
     const newSubcategory = subSelect.value;
@@ -586,33 +626,66 @@ async function showMoveTermDialog(
       return;
     }
 
-    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    try {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '이동 중...';
-      await api.moveTerms([termId], newCategory, newSubcategory);
-      backdrop.remove();
-      // Remove row from old table and add to new section immediately
-      const termData = row.querySelectorAll<HTMLTableCellElement>('td');
-      row.remove();
-      addTermRowToSection({
-        id: termId,
-        term: termData[0]?.textContent?.trim() ?? '',
-        full_name: termData[1]?.textContent?.trim() ?? '',
-        category: newCategory,
-        subcategory: newSubcategory,
-        description: termData[2]?.textContent?.trim() ?? '',
-        tags: [],
-      });
-      // Enhance the newly added row with admin controls
-      const newRow = document.getElementById(termId) as HTMLTableRowElement | null;
-      if (newRow) enhanceTermRow(newRow);
-      showToast('용어가 이동되었습니다.');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
-      submitBtn.disabled = false;
-      submitBtn.textContent = '이동';
-    }
+    backdrop.remove();
+
+    // Capture current row data before moving
+    const termData = row.querySelectorAll<HTMLTableCellElement>('td');
+    const rowTerm = termData[0]?.textContent?.trim() ?? '';
+    const rowFullName = termData[1]?.textContent?.trim() ?? '';
+    const rowDesc = termData[2]?.textContent?.trim() ?? '';
+
+    // Save reference to old parent tbody for undo
+    const oldTbody = row.closest('tbody')!;
+    const oldNextSibling = row.nextElementSibling;
+
+    // Move DOM: remove from old table, add to new section
+    row.remove();
+    addTermRowToSection({
+      id: termId,
+      term: rowTerm,
+      full_name: rowFullName,
+      category: newCategory,
+      subcategory: newSubcategory,
+      description: rowDesc,
+      tags: [],
+    });
+    // Enhance the newly added row with admin controls
+    const newRow = document.getElementById(termId) as HTMLTableRowElement | null;
+    if (newRow) enhanceTermRow(newRow);
+
+    addChange({
+      type: 'move_terms',
+      key: `move_terms::${termId}`,
+      payload: { termIds: [termId], newCategory, newSubcategory },
+      undo: () => {
+        // Remove from new location
+        const movedRow = document.getElementById(termId);
+        if (movedRow) movedRow.remove();
+        // Re-create in old location
+        const restoredRow = document.createElement('tr');
+        restoredRow.id = termId;
+        restoredRow.className = 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors';
+        const td1 = document.createElement('td');
+        td1.className = 'px-3 py-2 font-medium whitespace-nowrap text-gray-900 dark:text-gray-100';
+        td1.textContent = rowTerm;
+        const td2 = document.createElement('td');
+        td2.className = 'px-3 py-2 text-gray-600 dark:text-gray-400 whitespace-nowrap';
+        td2.textContent = rowFullName;
+        const td3 = document.createElement('td');
+        td3.className = 'px-3 py-2 text-gray-600 dark:text-gray-400';
+        td3.textContent = rowDesc;
+        restoredRow.appendChild(td1);
+        restoredRow.appendChild(td2);
+        restoredRow.appendChild(td3);
+        if (oldNextSibling) {
+          oldTbody.insertBefore(restoredRow, oldNextSibling);
+        } else {
+          oldTbody.appendChild(restoredRow);
+        }
+        enhanceTermRow(restoredRow);
+      },
+    });
+    showToast('용어 이동 대기 중');
   });
 }
 
@@ -654,23 +727,25 @@ function showNewCategoryDialog(): void {
     if (e.target === backdrop) backdrop.remove();
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     const fd = new FormData(form);
     const name = (fd.get('name') as string).trim();
     const code = `cat-${Date.now()}`;
-    try {
-      await api.createCategory({
-        code,
-        name,
-        order: Number(fd.get('order')),
-        description: '',
-      });
-      backdrop.remove();
-      showToast('카테고리가 추가되었습니다. 페이지를 새로고침하면 반영됩니다.');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
-    }
+    const order = Number(fd.get('order'));
+
+    backdrop.remove();
+    showToast('카테고리 추가 대기 중');
+
+    addChange({
+      type: 'create_category',
+      key: `create_category::${code}`,
+      payload: { data: { code, name, order, description: '' } },
+      undo: () => {
+        // Nothing to undo in DOM for new category — no section was created yet
+        // (new categories only appear after page refresh post-commit)
+      },
+    });
   });
 }
 
@@ -703,21 +778,27 @@ function enhanceSubcategoryHeading(h3: HTMLElement, catCode: string, subName: st
   delBtn.className = 'admin-sub-delete ml-2 p-0.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors';
   delBtn.innerHTML = '<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>';
   delBtn.title = '소분류 삭제';
-  delBtn.addEventListener('click', async () => {
+  delBtn.addEventListener('click', () => {
     const currentSubName = h3.getAttribute('data-subcategory') ?? subName;
-    if (!confirm(`"${currentSubName}" 소분류의 모든 용어를 삭제하시겠습니까?`)) return;
-    try {
-      await api.deleteSubcategory(catCode, currentSubName);
-      const wrapper = h3.closest('div.mb-6');
-      if (wrapper) {
-        wrapper.style.transition = 'opacity 0.3s';
-        wrapper.style.opacity = '0';
-        setTimeout(() => wrapper.remove(), 300);
-      }
-      showToast('소분류가 삭제되었습니다');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
+    if (!confirm(`"${currentSubName}" 소분류의 모든 용어를 삭제 대기열에 추가하시겠습니까?`)) return;
+
+    const changeKey = `delete_subcategory::${catCode}::${currentSubName}`;
+    const wrapper = h3.closest('div.mb-6') as HTMLElement | null;
+    if (wrapper) {
+      wrapper.classList.add('admin-row-pending-delete');
     }
+
+    addChange({
+      type: 'delete_subcategory',
+      key: changeKey,
+      payload: { categoryCode: catCode, subcategoryName: currentSubName },
+      undo: () => {
+        if (wrapper) {
+          wrapper.classList.remove('admin-row-pending-delete');
+        }
+      },
+    });
+    showToast('소분류 삭제 대기 중');
   });
   h3.appendChild(delBtn);
 }
@@ -768,41 +849,41 @@ function showSubcategoryEditDialog(heading: HTMLElement, catCode: string, curren
   cancelBtn.addEventListener('click', () => backdrop.remove());
   backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.remove(); });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     const newName = nameInput.value.trim();
     const newOrder = Number(orderInput.value);
     if (!newName) return;
 
-    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    try {
-      submitBtn.disabled = true;
-      submitBtn.textContent = '저장 중...';
+    // Rename if name changed — queue the rename
+    if (newName !== currentName) {
+      const originalName = currentName;
+      heading.childNodes[0].textContent = newName;
+      heading.setAttribute('data-subcategory', newName);
 
-      // Rename if name changed
-      if (newName !== currentName) {
-        await api.renameSubcategory(catCode, currentName, newName);
-        heading.childNodes[0].textContent = newName;
-        heading.setAttribute('data-subcategory', newName);
-      }
-
-      // Reorder if position changed
-      if (newOrder !== currentPos && newOrder >= 1 && newOrder <= totalSubs) {
-        const target = wrappers[newOrder - 1];
-        if (newOrder < currentPos) {
-          section.insertBefore(currentWrapper, target);
-        } else {
-          section.insertBefore(currentWrapper, target.nextSibling);
-        }
-      }
-
-      backdrop.remove();
-      showToast('소분류가 수정되었습니다');
-    } catch (err) {
-      showToast(`오류: ${(err as Error).message}`, true);
-      submitBtn.disabled = false;
-      submitBtn.textContent = '저장';
+      addChange({
+        type: 'rename_subcategory',
+        key: `rename_subcategory::${catCode}::${originalName}`,
+        payload: { categoryCode: catCode, oldName: originalName, newName },
+        undo: () => {
+          heading.childNodes[0].textContent = originalName;
+          heading.setAttribute('data-subcategory', originalName);
+        },
+      });
     }
+
+    // Reorder if position changed (DOM only — no DB representation for subcat order)
+    if (newOrder !== currentPos && newOrder >= 1 && newOrder <= totalSubs) {
+      const target = wrappers[newOrder - 1];
+      if (newOrder < currentPos) {
+        section.insertBefore(currentWrapper, target);
+      } else {
+        section.insertBefore(currentWrapper, target.nextSibling);
+      }
+    }
+
+    backdrop.remove();
+    showToast('소분류 수정 대기 중');
   });
 }
 

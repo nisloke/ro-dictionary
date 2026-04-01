@@ -1,22 +1,20 @@
 /**
- * Isomorphic data store — works at both BUILD TIME (Astro frontmatter)
+ * Isomorphic data store — works at both SERVER TIME (Astro frontmatter / SSR)
  * and RUNTIME (client-side <script>).
  *
  * Single source of truth: Supabase.
- * Client-side fallback: embedded <template> tags (for offline resilience).
+ * SSR mode: every request fetches fresh data from Supabase (no build-time cache).
  */
 
 // ---- Supabase config ---------------------------------------------------- //
-const SUPABASE_URL = 'https://nyftkqzrbanrxcoaxzke.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55ZnRrcXpyYmFucnhjb2F4emtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzEyNzUsImV4cCI6MjA5MDI0NzI3NX0.j7tmgGPOB7L6Zm3SnegJsE69xD-szUvpDMTFOUouCEY';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
 
-/** Clear cached promises so the next fetch hits Supabase again. */
+/** No-op in SSR mode — caching is disabled, every request fetches fresh data. */
 export function invalidateCache(): void {
-  _termsPromise = null;
-  _categoriesPromise = null;
+  // Intentionally empty: SSR mode has no cache to invalidate.
 }
 
 // ---- Types -------------------------------------------------------------- //
@@ -64,64 +62,44 @@ function normalizeCategory(row: Record<string, unknown>): CategoryEntry {
   };
 }
 
-// ---- Cache (per-environment) -------------------------------------------- //
-let _termsPromise: Promise<TermEntry[]> | null = null;
-let _categoriesPromise: Promise<CategoryEntry[]> | null = null;
-
 // ---- Public API --------------------------------------------------------- //
 
 /**
- * Fetch all terms from Supabase (cached after first call).
- * Works at build time (Node) and runtime (browser).
+ * Fetch all terms from Supabase.
+ * In SSR mode, always fetches fresh data (no caching).
+ * Client-side scripts also call this directly.
  */
-export function fetchTerms(): Promise<TermEntry[]> {
-  if (!_termsPromise) {
-    _termsPromise = (async () => {
-      try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/terms?select=*&order=id`,
-          { headers },
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const rows = await res.json();
-        return (rows as Record<string, unknown>[]).map(normalizeTerm);
-      } catch (err) {
-        console.warn('[dataStore] Supabase terms fetch failed', err);
-        // Client-side fallback: try embedded <template> tags
-        if (typeof document !== 'undefined') {
-          return parseFallback<TermEntry>('terms-data', 'terms-for-translator');
-        }
-        return [];
-      }
-    })();
+export async function fetchTerms(): Promise<TermEntry[]> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/terms?select=*&order=id`,
+      { headers },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    return (rows as Record<string, unknown>[]).map(normalizeTerm);
+  } catch (err) {
+    console.warn('[dataStore] Supabase terms fetch failed', err);
+    return [];
   }
-  return _termsPromise;
 }
 
 /**
- * Fetch all categories from Supabase (cached after first call).
+ * Fetch all categories from Supabase.
  */
-export function fetchCategories(): Promise<CategoryEntry[]> {
-  if (!_categoriesPromise) {
-    _categoriesPromise = (async () => {
-      try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/categories?select=*&order=order`,
-          { headers },
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const rows = await res.json();
-        return (rows as Record<string, unknown>[]).map(normalizeCategory);
-      } catch (err) {
-        console.warn('[dataStore] Supabase categories fetch failed', err);
-        if (typeof document !== 'undefined') {
-          return parseFallback<CategoryEntry>('categories-data');
-        }
-        return [];
-      }
-    })();
+export async function fetchCategories(): Promise<CategoryEntry[]> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/categories?select=*&order=order`,
+      { headers },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    return (rows as Record<string, unknown>[]).map(normalizeCategory);
+  } catch (err) {
+    console.warn('[dataStore] Supabase categories fetch failed', err);
+    return [];
   }
-  return _categoriesPromise;
 }
 
 // ---- Subcategory helpers ------------------------------------------------ //
@@ -162,17 +140,4 @@ export function buildSubcategoryMap(
     }
   }
   return map;
-}
-
-/** Client-side only: parse build-time embedded JSON from <template> tags */
-function parseFallback<T>(...ids: string[]): T[] {
-  for (const id of ids) {
-    const el = document.getElementById(id);
-    if (el?.innerHTML) {
-      try {
-        return JSON.parse(el.innerHTML);
-      } catch { /* try next */ }
-    }
-  }
-  return [];
 }

@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/vercel": "^9.0.5",
     "@supabase/supabase-js": "^2",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^5.18.1",
